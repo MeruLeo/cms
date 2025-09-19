@@ -1,4 +1,4 @@
-import express, { Request, Response, NextFunction, Express } from "express";
+import express, { Express } from "express";
 import cors from "cors";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
@@ -7,6 +7,8 @@ import path from "path";
 
 import config from "./config/config";
 import { errorHandler } from "./middlewares/errorHandler";
+
+import authRouter from "./modules/routes/auth.routes";
 
 const app: Express = express();
 
@@ -31,9 +33,7 @@ if (!productionMode) {
   app.use(morgan("dev"));
 }
 
-app.get("/", (req, res) => {
-  res.status(200).json({ msg: "Welcome to cms" });
-});
+app.use("/auth", authRouter);
 
 app.use(errorHandler);
 
