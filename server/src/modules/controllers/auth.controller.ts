@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import registerSchema from "../../validators/auth/register";
 import { UserModel } from "../../models/User";
 import bcrypt from "bcrypt";
+import { craeteUser } from "../../services/auth/register";
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -16,41 +17,12 @@ export const register = async (req: Request, res: Response) => {
       });
     }
 
-    const { email, fullName, password, username } = parsed.data;
-
-    const existingUser = await UserModel.findOne({
-      $or: [{ email }, { username }],
-    });
-    if (existingUser) {
-      return res.status(409).json({
-        ok: false,
-        message: "Email or username already exists",
-      });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const newUser = await UserModel.create({
-      fullName,
-      username,
-      email,
-      password: hashedPassword,
-    });
-
-    const userResponse = {
-      _id: newUser._id,
-      fullName: newUser.fullName,
-      username: newUser.username,
-      email: newUser.email,
-      avatar: newUser.avatar,
-      role: newUser.role,
-      createdAt: newUser.createdAt,
-    };
+    const user = craeteUser(parsed.data);
 
     return res.status(201).json({
       ok: true,
       message: "User registered successfully",
-      user: userResponse,
+      user,
     });
   } catch (err) {
     console.error("Register Error:", err);
