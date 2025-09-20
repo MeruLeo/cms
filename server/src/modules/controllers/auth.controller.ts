@@ -4,6 +4,14 @@ import { craeteUser } from "../../services/auth/register";
 import { AppError } from "../../middlewares/errorHandler";
 import loginSchema from "../../validators/auth/login";
 import { loginUser } from "../../services/auth/login";
+import { generateAccessToken, verifyRefreshToken } from "../../utils/jwt";
+import {
+  isRefreshTokenRevoked,
+  issueRefreshTokenForUser,
+  revokeRefreshToken,
+  rotateRefreshToken,
+} from "../../services/auth/token";
+import { getRefreshTokenCookieOptions } from "../../utils/cookies";
 
 export const register = async (
   req: Request,
@@ -20,10 +28,19 @@ export const register = async (
 
     const user = await craeteUser(parsed.data);
 
+    const accessToken = generateAccessToken(user._id.toString());
+
+    const { token: refreshToken } = await issueRefreshTokenForUser(
+      user._id.toString()
+    );
+
+    res.cookie("refreshToken", refreshToken, getRefreshTokenCookieOptions());
+
     return res.status(201).json({
       ok: true,
       message: "User registered successfully",
       user,
+      accessToken,
     });
   } catch (error) {
     next(error);
@@ -48,12 +65,102 @@ export const login = async (
     }
 
     const user = await loginUser(parsed.data);
+
+    const accessToken = generateAccessToken(user._id.toString());
+
+    const { token: refreshToken } = await issueRefreshTokenForUser(
+      user._id.toString()
+    );
+
+    res.cookie("refreshToken", refreshToken, getRefreshTokenCookieOptions());
+
     return res.status(200).json({
       ok: true,
       message: "Login successful",
       user,
+      accessToken,
     });
   } catch (error) {
     next(error);
+  }
+};
+
+export const refreshToken = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const refreshToken = req.cookies?.refreshToken;
+    if (!refreshToken) {
+      return res.status(401).json({ ok: false, message: "No refresh token" });
+    }
+
+    let payload: any;
+    try {
+      payload = verifyRefreshToken(refreshToken);
+    } catch (err) {
+      return res
+        .status(401)
+        .json({ ok: false, message: "Invalid refresh token" });
+    }
+
+    const { jti, userId } = payload;
+    if (!jti || !userId) {
+      return res
+        .status(401)
+        .json({ ok: false, message: "Invalid token payload" });
+    }
+
+    // check DB if token is revoked/exists
+    const revoked = await isRefreshTokenRevoked(jti);
+    if (revoked) {
+      return res
+        .status(401)
+        .json({ ok: false, message: "Refresh token revoked or expired" });
+    }
+
+    // rotate: create new refresh token in DB and revoke old one
+    const { token: newRefreshToken } = await rotateRefreshToken(jti, userId);
+
+    // issue new access token
+    const newAccessToken = generateAccessToken(userId);
+
+    // set new refresh cookie
+    res.cookie("refreshToken", newRefreshToken, getRefreshTokenCookieOptions());
+
+    return res.status(200).json({
+      ok: true,
+      accessToken: newAccessToken,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const logout = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const refreshToken = req.cookies?.refreshToken;
+    if (refreshToken) {
+      try {
+        const payload: any =
+          require("../../utils/jwt").verifyRefreshToken(refreshToken);
+        const { jti } = payload;
+        if (jti) {
+          await revokeRefreshToken(jti);
+        }
+      } catch (err) {
+        next(err);
+      }
+    }
+
+    res.clearCookie("refreshToken", { path: "/" });
+    return res.status(200).json({ ok: true, message: "Logged out" });
+  } catch (err) {
+    next(err);
   }
 };

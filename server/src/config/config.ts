@@ -29,8 +29,8 @@ const config: Config = {
   auth: {
     accessSecret: process.env.JWT_ACCESS_SECRET as string,
     refreshSecret: process.env.JWT_REFRESH_SECRET as string,
-    accessExpiresIn: "15m",
-    refreshExpiresIn: "7d",
+    accessExpiresIn: "15m" as const,
+    refreshExpiresIn: "7d" as const,
   },
 };
 
