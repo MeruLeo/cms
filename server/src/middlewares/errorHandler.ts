@@ -1,7 +1,12 @@
 import { Request, Response, NextFunction } from "express";
 
-interface AppError extends Error {
-  status?: number;
+export class AppError extends Error {
+  status: number;
+  constructor(message: string, status: number = 500) {
+    super(message);
+    this.status = status;
+    Object.setPrototypeOf(this, new.target.prototype);
+  }
 }
 
 export const errorHandler = (
@@ -10,8 +15,9 @@ export const errorHandler = (
   res: Response,
   next: NextFunction
 ) => {
-  console.log(err);
+  console.error("Error:", err.message);
   res.status(err.status || 500).json({
+    ok: false,
     message: err.message || "Internal Server Error",
   });
 };

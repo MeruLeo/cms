@@ -10,6 +10,12 @@ interface Config {
     local: string;
     product: string;
   };
+  auth: {
+    accessSecret: string;
+    refreshSecret: string;
+    accessExpiresIn: string;
+    refreshExpiresIn: string;
+  };
 }
 
 const config: Config = {
@@ -19,6 +25,12 @@ const config: Config = {
   origions: {
     local: process.env.LOCAL_ORIGIN!,
     product: process.env.PRODUCT_ORIGIN!,
+  },
+  auth: {
+    accessSecret: process.env.JWT_ACCESS_SECRET as string,
+    refreshSecret: process.env.JWT_REFRESH_SECRET as string,
+    accessExpiresIn: "15m",
+    refreshExpiresIn: "7d",
   },
 };
 
