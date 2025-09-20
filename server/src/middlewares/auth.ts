@@ -4,7 +4,7 @@ import { verifyAccessToken } from "../utils/jwt";
 declare global {
   namespace Express {
     interface Request {
-      user?: { userId: string };
+      user?: { userId: string; role: string; isActive: boolean };
     }
   }
 }
@@ -19,15 +19,27 @@ export const authenticate = (
     if (!authHeader) {
       return res.status(401).json({ ok: false, message: "No token provided" });
     }
-    const parts = authHeader.split(" ");
-    if (parts.length !== 2 || parts[0] !== "Bearer") {
+
+    const [scheme, token] = authHeader.split(" ");
+    if (scheme !== "Bearer" || !token) {
       return res
         .status(401)
         .json({ ok: false, message: "Invalid auth header" });
     }
-    const token = parts[1];
+
     const payload = verifyAccessToken(token);
-    req.user = { userId: payload.userId };
+    req.user = {
+      userId: payload.userId,
+      role: payload.role,
+      isActive: payload.isActive,
+    };
+
+    if (!req.user.isActive) {
+      return res
+        .status(401)
+        .json({ ok: false, message: "Account is deactivated" });
+    }
+
     next();
   } catch (err) {
     return res
