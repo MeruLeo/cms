@@ -12,6 +12,7 @@ import {
   rotateRefreshToken,
 } from "../../services/auth/token";
 import { getRefreshTokenCookieOptions } from "../../utils/cookies";
+import { UserModel } from "../../models/User";
 
 export const register = async (
   req: Request,
@@ -28,7 +29,11 @@ export const register = async (
 
     const user = await craeteUser(parsed.data);
 
-    const accessToken = generateAccessToken(user._id.toString());
+    const accessToken = generateAccessToken(
+      user._id.toString(),
+      user.role,
+      user.isActive
+    );
 
     const { token: refreshToken } = await issueRefreshTokenForUser(
       user._id.toString()
@@ -66,7 +71,11 @@ export const login = async (
 
     const user = await loginUser(parsed.data);
 
-    const accessToken = generateAccessToken(user._id.toString());
+    const accessToken = generateAccessToken(
+      user._id.toString(),
+      user.role,
+      user.isActive
+    );
 
     const { token: refreshToken } = await issueRefreshTokenForUser(
       user._id.toString()
@@ -112,6 +121,11 @@ export const refreshToken = async (
         .json({ ok: false, message: "Invalid token payload" });
     }
 
+    const user = await UserModel.findOne({ _id: userId });
+    if (!user) {
+      return res.status(404).json({ ok: false, message: "User not found" });
+    }
+
     // check DB if token is revoked/exists
     const revoked = await isRefreshTokenRevoked(jti);
     if (revoked) {
@@ -124,7 +138,11 @@ export const refreshToken = async (
     const { token: newRefreshToken } = await rotateRefreshToken(jti, userId);
 
     // issue new access token
-    const newAccessToken = generateAccessToken(userId);
+    const newAccessToken = generateAccessToken(
+      user._id.toString(),
+      user.role,
+      user.isActive
+    );
 
     // set new refresh cookie
     res.cookie("refreshToken", newRefreshToken, getRefreshTokenCookieOptions());

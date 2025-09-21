@@ -35,6 +35,7 @@ export const authenticate = (
     };
 
     if (!req.user.isActive) {
+      console.log(req.user);
       return res
         .status(401)
         .json({ ok: false, message: "Account is deactivated" });

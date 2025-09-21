@@ -2,8 +2,12 @@ import jwt from "jsonwebtoken";
 import config from "../config/config";
 import { v4 as uuidv4 } from "uuid";
 
-export const generateAccessToken = (userId: string) => {
-  const payload = { userId };
+export const generateAccessToken = (
+  userId: string,
+  role: "admin" | "user",
+  isActive: boolean
+) => {
+  const payload = { userId, role, isActive };
 
   const options: jwt.SignOptions = {
     expiresIn: config.auth

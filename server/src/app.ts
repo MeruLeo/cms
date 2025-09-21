@@ -9,6 +9,7 @@ import config from "./config/config";
 import { errorHandler } from "./middlewares/errorHandler";
 
 import authRouter from "./modules/routes/auth.routes";
+import usersRouter from "./modules/routes/user.routes";
 
 const app: Express = express();
 
@@ -34,6 +35,7 @@ if (!productionMode) {
 }
 
 app.use("/auth", authRouter);
+app.use("/users", usersRouter);
 
 app.use(errorHandler);
 
