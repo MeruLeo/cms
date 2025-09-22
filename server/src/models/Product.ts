@@ -4,7 +4,14 @@ import { IProduct, ProductStatus } from "../types/product";
 const productSchema = new Schema<IProduct>(
   {
     title: { type: String, required: true, trim: true },
-    slug: { type: String, required: true, unique: true, trim: true },
+    slug: {
+      type: String,
+      required: true,
+      trim: true,
+      lowercase: true,
+      unique: true,
+      match: /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+    },
     description: { type: String },
     price: { type: Number, required: true },
     status: {

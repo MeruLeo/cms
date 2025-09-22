@@ -2,19 +2,33 @@ import { z } from "zod";
 
 export const productSchema = z.object({
   title: z.string().min(3, { message: "Title must be at least 3 characters" }),
-  slug: z.string().min(2, { message: "slug must be at least 3 characters" }),
+
+  slug: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .min(1, { message: "slug الزامی است" })
+    .max(160, { message: "slug طولانی است" })
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, {
+      message: "slug فقط شامل حروف انگلیسی، اعداد و '-' به‌صورت جدا کننده است",
+    }),
+
   description: z
     .string()
     .max(1000, { message: "Description too long" })
     .optional(),
+
   price: z.coerce
     .number()
     .positive({ message: "Price must be greater than 0" }),
+
   status: z.enum(["available", "out_of_stock", "discontinued"]),
+
   category: z
     .string()
     .min(2, { message: "Category must be at least 2 characters" })
     .optional(),
+
   tags: z
     .union([
       z
