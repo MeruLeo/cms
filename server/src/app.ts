@@ -12,6 +12,7 @@ import authRouter from "./modules/routes/auth.routes";
 import usersRouter from "./modules/routes/user.routes";
 import productsRouter from "./modules/routes/product.routes";
 import categoriesRouter from "./modules/routes/category.routes";
+import couponsRouter from "./modules/routes/coupon.routes";
 
 const app: Express = express();
 
@@ -40,6 +41,7 @@ app.use("/auth", authRouter);
 app.use("/users", usersRouter);
 app.use("/products", productsRouter);
 app.use("/categories", categoriesRouter);
+app.use("/coupons", couponsRouter);
 
 app.use(errorHandler);
 
