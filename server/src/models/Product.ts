@@ -4,6 +4,7 @@ import { IProduct, ProductStatus } from "../types/product";
 const productSchema = new Schema<IProduct>(
   {
     title: { type: String, required: true, trim: true },
+    slug: { type: String, required: true, unique: true, trim: true },
     description: { type: String },
     price: { type: Number, required: true },
     status: {

@@ -10,6 +10,7 @@ import { errorHandler } from "./middlewares/errorHandler";
 
 import authRouter from "./modules/routes/auth.routes";
 import usersRouter from "./modules/routes/user.routes";
+import productsRouter from "./modules/routes/product.routes";
 
 const app: Express = express();
 
@@ -36,6 +37,7 @@ if (!productionMode) {
 
 app.use("/auth", authRouter);
 app.use("/users", usersRouter);
+app.use("/products", productsRouter);
 
 app.use(errorHandler);
 
