@@ -12,8 +12,25 @@ export const couponService = {
     endDate: Date;
     isActive: boolean;
     scope: "public" | "private";
-    allowedUsers: string[];
+    allowedUsers?: string[] | Types.ObjectId[];
   }) {
+    if (data.scope === "private") {
+      if (
+        !data.allowedUsers ||
+        !Array.isArray(data.allowedUsers) ||
+        data.allowedUsers.length === 0
+      ) {
+        throw new Error(
+          "For private scope, allowedUsers list must be provided"
+        );
+      }
+      data.allowedUsers = data.allowedUsers.map(
+        (u: any) => new Types.ObjectId(u)
+      );
+    } else {
+      delete data.allowedUsers;
+    }
+
     return await CouponModel.create(data);
   },
 
@@ -28,7 +45,52 @@ export const couponService = {
 
   async updateCoupon(id: string, data: Partial<any>) {
     if (!Types.ObjectId.isValid(id)) return null;
-    return await CouponModel.findByIdAndUpdate(id, data, { new: true });
+
+    const allowedFields = [
+      "code",
+      "description",
+      "discountType",
+      "discountValue",
+      "usageLimit",
+      "startDate",
+      "endDate",
+      "isActive",
+      "scope",
+      "allowedUsers",
+    ];
+
+    const update: any = {};
+    for (const key of allowedFields) {
+      if (Object.prototype.hasOwnProperty.call(data, key)) {
+        update[key] = (data as any)[key];
+      }
+    }
+
+    if (update.scope === "public" && "allowedUsers" in update) {
+      delete update.allowedUsers;
+    }
+
+    if ("allowedUsers" in update) {
+      if (!Array.isArray(update.allowedUsers)) {
+        throw new Error("allowedUsers must be an array of IDs");
+      }
+      update.allowedUsers = update.allowedUsers.map(
+        (u: any) => new Types.ObjectId(u)
+      );
+    }
+
+    if (
+      update.scope === "private" &&
+      (!update.allowedUsers || update.allowedUsers.length === 0)
+    ) {
+      throw new Error("For private scope, valid allowedUsers must be provided");
+    }
+
+    return await CouponModel.findByIdAndUpdate(
+      id,
+      { $set: update },
+      { new: true, runValidators: true }
+    );
   },
 
   async deleteCoupon(id: string) {
@@ -36,22 +98,34 @@ export const couponService = {
     return await CouponModel.findByIdAndDelete(id);
   },
 
-  async applyCoupon(code: string, userId: Types.ObjectId) {
-    const coupon = await CouponModel.findOne({ code, isActive: true });
-    if (!coupon) throw new Error("کد تخفیف معتبر نیست یا غیرفعال است");
-
+  async applyCoupon(code: string, userId: Types.ObjectId | string) {
     const now = new Date();
-    if (coupon.startDate > now || coupon.endDate < now) {
-      throw new Error("کد تخفیف منقضی شده است");
-    }
+    const uid = new Types.ObjectId(userId);
 
-    if (coupon.scope === "private" && !coupon.allowedUsers?.includes(userId)) {
-      throw new Error("این کد برای شما معتبر نیست");
-    }
+    const coupon = await CouponModel.findOneAndUpdate(
+      {
+        code,
+        isActive: true,
+        startDate: { $lte: now },
+        endDate: { $gte: now },
 
-    if (coupon.usageLimit && coupon.usedCount >= coupon.usageLimit) {
-      throw new Error("سقف استفاده از این کد تکمیل شده است");
-    }
+        $and: [
+          {
+            $or: [{ scope: "public" }, { scope: "private", allowedUsers: uid }],
+          },
+          {
+            $or: [
+              { usageLimit: { $exists: false } },
+              { $expr: { $lt: ["$usedCount", "$usageLimit"] } },
+            ],
+          },
+        ],
+      },
+      { $inc: { usedCount: 1 } },
+      { new: true, runValidators: true }
+    );
+
+    if (!coupon) throw new Error("Coupon code is invalid or cannot be used");
 
     return coupon;
   },
@@ -59,7 +133,7 @@ export const couponService = {
   async incrementUsage(id: string) {
     return await CouponModel.findByIdAndUpdate(
       id,
-      { $inc: { usageCount: 1 } },
+      { $inc: { usedCount: 1 } },
       { new: true }
     );
   },

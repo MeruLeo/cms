@@ -48,7 +48,7 @@ export async function getCoupon(
 ) {
   try {
     const coupon = await couponService.getCouponById(req.params.id);
-    if (!coupon) return next(new AppError("کوپن یافت نشد", 404));
+    if (!coupon) return next(new AppError("Coupon not found", 404));
 
     res.json({ ok: true, data: coupon });
   } catch (err) {
@@ -71,7 +71,7 @@ export async function updateCoupon(
     }
 
     const coupon = await couponService.updateCoupon(req.params.id, parsed.data);
-    if (!coupon) return next(new AppError("کوپن یافت نشد", 404));
+    if (!coupon) return next(new AppError("Coupon not found", 404));
 
     res.json({ ok: true, data: coupon });
   } catch (err) {
@@ -86,9 +86,9 @@ export async function deleteCoupon(
 ) {
   try {
     const coupon = await couponService.deleteCoupon(req.params.id);
-    if (!coupon) return next(new AppError("کوپن یافت نشد", 404));
+    if (!coupon) return next(new AppError("Coupon not found", 404));
 
-    res.json({ ok: true, message: "کوپن حذف شد" });
+    res.json({ ok: true, message: "Coupon deleted" });
   } catch (err) {
     next(err);
   }
@@ -102,7 +102,7 @@ export async function applyCoupon(
   try {
     const { code, userId } = req.body;
     if (!code || !userId) {
-      return next(new AppError("کد و شناسه کاربر الزامی است", 400));
+      return next(new AppError("Code and user ID are required", 400));
     }
 
     const coupon = await couponService.applyCoupon(code, userId);
