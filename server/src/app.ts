@@ -13,6 +13,7 @@ import usersRouter from "./modules/routes/user.routes";
 import productsRouter from "./modules/routes/product.routes";
 import categoriesRouter from "./modules/routes/category.routes";
 import couponsRouter from "./modules/routes/coupon.routes";
+import commentRouter from "./modules/routes/comment.routes";
 
 const app: Express = express();
 
@@ -42,6 +43,7 @@ app.use("/users", usersRouter);
 app.use("/products", productsRouter);
 app.use("/categories", categoriesRouter);
 app.use("/coupons", couponsRouter);
+app.use("/comments", commentRouter);
 
 app.use(errorHandler);
 
