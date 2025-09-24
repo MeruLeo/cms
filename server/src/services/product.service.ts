@@ -1,7 +1,7 @@
 import { FilterQuery } from "mongoose";
-import { IProduct } from "../../types/product";
-import { ProductModel } from "../../models/Product";
-import { AppError } from "../../middlewares/errorHandler";
+import { IProduct } from "../types/product";
+import { ProductModel } from "../models/Product";
+import { AppError } from "../middlewares/errorHandler";
 
 export interface FindProductsOptions {
   filters: {

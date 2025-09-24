@@ -1,12 +1,12 @@
 // services/category.service.ts
-import { CategoryModel } from "../../models/Category";
-import { ICategory } from "../../types/category";
+import { CategoryModel } from "../models/Category";
+import { ICategory } from "../types/category";
 import { Types } from "mongoose";
 import {
   CategoryCreateInput,
   CategoryUpdateInput,
-} from "../../validators/categories/category";
-import { AppError } from "../../middlewares/errorHandler";
+} from "../validators/categories/category";
+import { AppError } from "../middlewares/errorHandler";
 
 export async function createCategory(
   data: CategoryCreateInput

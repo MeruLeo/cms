@@ -1,6 +1,6 @@
 import { FilterQuery } from "mongoose";
-import { UserModel } from "../../models/User";
-import { IUser } from "../../types/user";
+import { UserModel } from "../models/User";
+import { IUser } from "../types/user";
 
 interface FindUsersOptions {
   filters: {

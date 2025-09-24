@@ -1,16 +1,16 @@
 import { Request, Response, NextFunction } from "express";
 import registerSchema from "../../validators/auth/register";
-import { craeteUser } from "../../services/auth/register";
+import { craeteUser } from "../../services/auth/register.service";
 import { AppError } from "../../middlewares/errorHandler";
 import loginSchema from "../../validators/auth/login";
-import { loginUser } from "../../services/auth/login";
+import { loginUser } from "../../services/auth/login.service";
 import { generateAccessToken, verifyRefreshToken } from "../../utils/jwt";
 import {
   isRefreshTokenRevoked,
   issueRefreshTokenForUser,
   revokeRefreshToken,
   rotateRefreshToken,
-} from "../../services/auth/token";
+} from "../../services/auth/token.service";
 import { getRefreshTokenCookieOptions } from "../../utils/cookies";
 import { UserModel } from "../../models/User";
 

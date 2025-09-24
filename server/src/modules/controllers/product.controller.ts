@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import * as productService from "../../services/products/product";
+import * as productService from "../../services/product.service";
 import { productSchema } from "../../validators/products/product";
 import { AppError } from "../../middlewares/errorHandler";
 import { IProduct, ProductStatus } from "../../types/product";

@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import * as categoryService from "../../services/categories/category";
+import * as categoryService from "../../services/category.service";
 import {
   categoryCreateSchema,
   categoryUpdateSchema,
