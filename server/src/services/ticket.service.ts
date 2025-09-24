@@ -4,7 +4,7 @@ import {
   TicketStatus,
   TicketPriority,
   CreateTicketInput,
-} from "../types/ticket.type";
+} from "../types/ticket.type.type";
 import { Types } from "mongoose";
 import { AppError } from "../middlewares/errorHandler";
 

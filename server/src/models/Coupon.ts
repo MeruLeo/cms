@@ -1,5 +1,5 @@
 import { model, Schema } from "mongoose";
-import { ICoupon } from "../types/coupon";
+import { ICoupon } from "../types/coupon.type";
 
 const couponSchema = new Schema<ICoupon>(
   {

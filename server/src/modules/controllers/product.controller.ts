@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import * as productService from "../../services/product.service";
 import { productSchema } from "../../validators/products/product";
 import { AppError } from "../../middlewares/errorHandler";
-import { IProduct, ProductStatus } from "../../types/product";
+import { IProduct, ProductStatus } from "../../types/product.type";
 import mongoose from "mongoose";
 
 export const getAll = async (

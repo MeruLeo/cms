@@ -1,5 +1,5 @@
 import { Schema, model, Document, Types } from "mongoose";
-import { ICategory } from "../types/category";
+import { ICategory } from "../types/category.type";
 import { makeSlug } from "../utils/makeSlug";
 
 const categorySchema = new Schema<ICategory>(

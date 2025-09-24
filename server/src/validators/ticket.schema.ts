@@ -3,7 +3,7 @@ import {
   TicketStatus,
   TicketPriority,
   TicketCategory,
-} from "../types/ticket.type";
+} from "../types/ticket.type.type";
 
 export const createTicketSchema = z.object({
   title: z

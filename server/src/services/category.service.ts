@@ -1,6 +1,6 @@
 // services/category.service.ts
 import { CategoryModel } from "../models/Category";
-import { ICategory } from "../types/category";
+import { ICategory } from "../types/category.type";
 import { Types } from "mongoose";
 import {
   CategoryCreateInput,

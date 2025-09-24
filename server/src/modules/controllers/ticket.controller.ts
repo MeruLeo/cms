@@ -7,7 +7,7 @@ import {
   updatePrioritySchema,
 } from "../../validators/ticket.schema";
 import { AppError } from "../../middlewares/errorHandler";
-import { TicketStatus } from "../../types/ticket.type";
+import { TicketStatus } from "../../types/ticket.type.type";
 
 export const createTicket = async (
   req: Request,

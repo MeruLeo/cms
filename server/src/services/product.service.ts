@@ -1,5 +1,5 @@
 import { FilterQuery } from "mongoose";
-import { IProduct } from "../types/product";
+import { IProduct } from "../types/product.type";
 import { ProductModel } from "../models/Product";
 import { AppError } from "../middlewares/errorHandler";
 

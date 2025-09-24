@@ -1,7 +1,7 @@
 import { CommentModel } from "../models/Comment";
 import { Types } from "mongoose";
 import { AppError } from "../middlewares/errorHandler";
-import { IComment } from "../types/comment";
+import { IComment } from "../types/comment.type";
 
 interface CreateCommentDTO {
   product: string;
