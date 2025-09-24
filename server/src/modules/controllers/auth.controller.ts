@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
-import registerSchema from "../../validators/auth/register";
+import registerSchema from "../../validators/auth/register.schema";
 import { craeteUser } from "../../services/auth/register.service";
 import { AppError } from "../../middlewares/errorHandler";
-import loginSchema from "../../validators/auth/login";
+import loginSchema from "../../validators/auth/login.schema";
 import { loginUser } from "../../services/auth/login.service";
 import { generateAccessToken, verifyRefreshToken } from "../../utils/jwt";
 import {

@@ -3,7 +3,7 @@ import * as categoryService from "../../services/category.service";
 import {
   categoryCreateSchema,
   categoryUpdateSchema,
-} from "../../validators/categories/category";
+} from "../../validators/category.schema";
 import { AppError } from "../../middlewares/errorHandler";
 
 export async function create(req: Request, res: Response, next: NextFunction) {

@@ -1,10 +1,9 @@
-// controllers/coupon.controller.ts
 import { Request, Response, NextFunction } from "express";
 import { couponService } from "../../services/coupon.service";
 import {
   couponCreateSchema,
   couponUpdateSchema,
-} from "../../validators/coupon";
+} from "../../validators/coupon.schema";
 import { AppError } from "../../middlewares/errorHandler";
 
 export async function createCoupon(

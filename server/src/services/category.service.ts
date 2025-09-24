@@ -5,7 +5,7 @@ import { Types } from "mongoose";
 import {
   CategoryCreateInput,
   CategoryUpdateInput,
-} from "../validators/categories/category";
+} from "../validators/category.schema";
 import { AppError } from "../middlewares/errorHandler";
 
 export async function createCategory(
