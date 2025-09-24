@@ -15,6 +15,7 @@ import categoriesRouter from "./modules/routes/category.routes";
 import couponsRouter from "./modules/routes/coupon.routes";
 import commentRouter from "./modules/routes/comment.routes";
 import ticketsRouter from "./modules/routes/ticket.routes";
+import ordersRouter from "./modules/routes/order.routes";
 
 const app: Express = express();
 
@@ -46,6 +47,7 @@ app.use("/categories", categoriesRouter);
 app.use("/coupons", couponsRouter);
 app.use("/comments", commentRouter);
 app.use("/tickets", ticketsRouter);
+app.use("/orders", ordersRouter);
 
 app.use(errorHandler);
 
