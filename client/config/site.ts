@@ -1,28 +1,83 @@
 export type SiteConfig = typeof siteConfig;
+import { Component, Warehouse } from "lucide-react";
 
 export const siteConfig = {
-  name: "Next.js + HeroUI",
-  description: "Make beautiful websites regardless of your design experience.",
+  name: "CMS",
+  description: "cms for shops",
   navItems: [
     {
-      label: "Home",
+      label: "داشبورد",
       href: "/",
+      icon: Component,
     },
     {
-      label: "Docs",
-      href: "/docs",
+      label: "انبار",
+      href: "/store",
+      icon: Warehouse,
     },
     {
-      label: "Pricing",
-      href: "/pricing",
+      label: "مشتریان",
+      href: "/customers",
+      icon: "",
     },
     {
-      label: "Blog",
-      href: "/blog",
+      label: "سفارشات",
+      icon: "",
+      items: [
+        {
+          label: "همه سفارشات",
+          href: "/orders",
+        },
+        {
+          label: "تحویل داده شده ها",
+          href: "/orders/delivered",
+        },
+        {
+          label: "لغو شده ها",
+          href: "/orders/canceled",
+        },
+      ],
     },
     {
-      label: "About",
-      href: "/about",
+      label: "نظرات",
+      icon: "",
+      items: [
+        {
+          label: "همه نظرات",
+          href: "/comments",
+        },
+        {
+          label: "نظرات تایید شده",
+          href: "/comments/approveds",
+        },
+        {
+          label: "نظرات تایید نشده",
+          href: "/comments/rejecteds",
+        },
+      ],
+    },
+    {
+      label: "تیکت‌ها",
+      icon: "",
+      items: [
+        {
+          label: "همه تیکت ها",
+          href: "/tickets",
+        },
+        {
+          label: "تیکت های در انتظار پاسخ",
+          href: "/tickets",
+        },
+        {
+          label: "تیکت های پاسخ داده شده",
+          href: "/tickets",
+        },
+      ],
+    },
+    {
+      label: "تنظیمات",
+      icon: "",
+      href: "/settings",
     },
   ],
   navMenuItems: [

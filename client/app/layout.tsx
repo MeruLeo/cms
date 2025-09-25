@@ -6,8 +6,9 @@ import clsx from "clsx";
 import { Providers } from "./providers";
 
 import { siteConfig } from "@/config/site";
-import { fontSans } from "@/config/fonts";
+import { sfBold, sfLight, sfMed } from "@/config/fonts";
 import { Navbar } from "@/components/navbar";
+import { Sidebar } from "@/components/sidebar";
 
 export const metadata: Metadata = {
   title: {
@@ -33,31 +34,23 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html suppressHydrationWarning lang="en">
+    <html suppressHydrationWarning lang="en" dir="rtl">
       <head />
       <body
         className={clsx(
-          "min-h-screen text-foreground bg-background font-sans antialiased",
-          fontSans.variable,
+          sfLight.variable,
+          sfMed.variable,
+          sfBold.variable,
+          "relative z-0 min-h-screen font-sf-med text-foreground bg-background antialiased"
         )}
       >
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
-          <div className="relative flex flex-col h-screen">
-            <Navbar />
-            <main className="container mx-auto max-w-7xl pt-16 px-6 flex-grow">
+          <div className="relative flex h-screen">
+            <Sidebar />
+            <main className="container mx-auto max-w-7xl px-6 flex-grow">
+              <Navbar />
               {children}
             </main>
-            <footer className="w-full flex items-center justify-center py-3">
-              <Link
-                isExternal
-                className="flex items-center gap-1 text-current"
-                href="https://heroui.com?utm_source=next-app-template"
-                title="heroui.com homepage"
-              >
-                <span className="text-default-600">Powered by</span>
-                <p className="text-primary">HeroUI</p>
-              </Link>
-            </footer>
           </div>
         </Providers>
       </body>
