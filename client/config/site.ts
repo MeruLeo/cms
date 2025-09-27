@@ -1,5 +1,12 @@
-export type SiteConfig = typeof siteConfig;
-import { Component, Warehouse } from "lucide-react";
+import {
+  LayoutDashboard,
+  Boxes,
+  Users,
+  ShoppingCart,
+  MessageSquare,
+  Ticket,
+  Settings,
+} from "lucide-react";
 
 export const siteConfig = {
   name: "CMS",
@@ -8,21 +15,21 @@ export const siteConfig = {
     {
       label: "داشبورد",
       href: "/",
-      icon: Component,
+      icon: "LayoutDashboard",
     },
     {
       label: "انبار",
       href: "/store",
-      icon: Warehouse,
+      icon: "Boxes",
     },
     {
       label: "مشتریان",
       href: "/customers",
-      icon: "",
+      icon: "UsersRound",
     },
     {
       label: "سفارشات",
-      icon: "",
+      icon: "ShoppingBasket",
       items: [
         {
           label: "همه سفارشات",
@@ -40,7 +47,7 @@ export const siteConfig = {
     },
     {
       label: "نظرات",
-      icon: "",
+      icon: "MessageCircle",
       items: [
         {
           label: "همه نظرات",
@@ -58,67 +65,29 @@ export const siteConfig = {
     },
     {
       label: "تیکت‌ها",
-      icon: "",
+      icon: "Ticket",
       items: [
         {
           label: "همه تیکت ها",
           href: "/tickets",
         },
         {
-          label: "تیکت های در انتظار پاسخ",
-          href: "/tickets",
+          label: "در انتظار پاسخ",
+          href: "/tickets/pending",
         },
         {
-          label: "تیکت های پاسخ داده شده",
-          href: "/tickets",
+          label: "پاسخ داده شده",
+          href: "/tickets/answered",
         },
       ],
     },
     {
       label: "تنظیمات",
-      icon: "",
+      icon: "Settings",
       href: "/settings",
-    },
-  ],
-  navMenuItems: [
-    {
-      label: "Profile",
-      href: "/profile",
-    },
-    {
-      label: "Dashboard",
-      href: "/dashboard",
-    },
-    {
-      label: "Projects",
-      href: "/projects",
-    },
-    {
-      label: "Team",
-      href: "/team",
-    },
-    {
-      label: "Calendar",
-      href: "/calendar",
-    },
-    {
-      label: "Settings",
-      href: "/settings",
-    },
-    {
-      label: "Help & Feedback",
-      href: "/help-feedback",
-    },
-    {
-      label: "Logout",
-      href: "/logout",
     },
   ],
   links: {
     github: "https://github.com/heroui-inc/heroui",
-    twitter: "https://twitter.com/hero_ui",
-    docs: "https://heroui.com",
-    discord: "https://discord.gg/9b6yyZKmH4",
-    sponsor: "https://patreon.com/jrgarciadev",
   },
 };
