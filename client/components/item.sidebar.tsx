@@ -48,12 +48,8 @@ const SidebarBtn: React.FC<SidebarBtnProps> = ({
   return (
     <Button
       fullWidth
-      className={`flex bg-red items-center justify-between transition-colors duration-300
-        ${
-          active
-            ? "bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-md"
-            : ""
-        }`}
+      className={`flex bg-transparent items-center justify-between transition-colors duration-300
+        ${active ? "bg-gradient-to-l from-gray3 to-gray4" : null}`}
       endContent={
         !isLink ? (
           isOpen ? (
@@ -86,9 +82,7 @@ const DropdownBtnItem: React.FC<{
       href={href}
       fullWidth
       variant="faded"
-      className={`my-1 transition-colors duration-300 ${
-        active ? "bg-gradient-to-r from-indigo to-pink text-white shadow" : ""
-      }`}
+      className={`my-1 transition-colors duration-300`}
     >
       {label}
     </Button>
@@ -139,16 +133,19 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
         <ul
           className={`transition-all duration-300 overflow-hidden ${
             isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
-          } flex-col pr-10`}
+          } flex-row flex pr-5 gap-4`}
         >
-          {items.map((it) => (
-            <DropdownBtnItem
-              key={it.href}
-              href={it.href}
-              label={it.label}
-              active={pathname === it.href}
-            />
-          ))}
+          <div className="w-0.5 bg-gray3 rounded-full" />
+          <ul className="flex flex-col">
+            {items.map((it) => (
+              <DropdownBtnItem
+                key={it.href}
+                href={it.href}
+                label={it.label}
+                active={pathname === it.href}
+              />
+            ))}
+          </ul>
         </ul>
       </li>
     );

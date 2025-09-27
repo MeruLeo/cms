@@ -1,14 +1,12 @@
 import "@/styles/globals.css";
 import { Metadata, Viewport } from "next";
-import { Link } from "@heroui/link";
 import clsx from "clsx";
 
 import { Providers } from "./providers";
-
 import { siteConfig } from "@/config/site";
 import { sfBold, sfLight, sfMed } from "@/config/fonts";
-import { Navbar } from "@/components/navbar";
 import { Sidebar } from "@/components/sidebar";
+import { CurrentNavbar } from "@/components/currentNavLable";
 
 export const metadata: Metadata = {
   title: {
@@ -47,8 +45,8 @@ export default function RootLayout({
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
           <div className="relative flex h-screen">
             <Sidebar />
-            <main className="container mx-auto max-w-7xl px-6 flex-grow">
-              <Navbar />
+            <main className="mx-auto flex-grow">
+              <CurrentNavbar />
               {children}
             </main>
           </div>

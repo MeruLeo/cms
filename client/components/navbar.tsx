@@ -31,13 +31,15 @@ import {
   SearchIcon,
   Logo,
 } from "@/components/icons";
+import { Bell, Cog, Settings, Settings2 } from "lucide-react";
 
-export const Navbar = () => {
+export const Navbar = ({ title }: { title: string }) => {
   const searchInput = (
     <Input
       aria-label="Search"
+      radius="full"
       classNames={{
-        inputWrapper: "bg-default-100",
+        inputWrapper: "bg-default-100 border border-gray3",
         input: "text-sm",
       }}
       labelPlacement="outside"
@@ -50,13 +52,15 @@ export const Navbar = () => {
   );
 
   return (
-    <HeroUINavbar maxWidth="xl" position="sticky">
+    <HeroUINavbar
+      maxWidth="xl"
+      position="sticky"
+      className="bg-gray4 border-b border-gray3"
+    >
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
         <NavbarBrand as="li" className="gap-3 max-w-fit">
           <NextLink className="flex justify-start items-center gap-1" href="/">
-            <p className="font-bold  text-2xl text-inherit">
-              امیرعلی عزیز ، خوش آمدی
-            </p>
+            <p className="font-bold  text-2xl text-inherit">{title}</p>
           </NextLink>
         </NavbarBrand>
       </NavbarContent>
@@ -66,10 +70,29 @@ export const Navbar = () => {
         justify="end"
       >
         <NavbarItem className="hidden sm:flex gap-2">
-          <Link isExternal aria-label="Github" href={siteConfig.links.github}>
+          <Link
+            className="bg-default-100 p-2 rounded-full border border-gray3"
+            isExternal
+            aria-label="Github"
+            href={siteConfig.links.github}
+          >
             <GithubIcon className="text-default-500" />
           </Link>
-          <ThemeSwitch />
+          <Link
+            className="bg-default-100 p-2 border border-gray3 rounded-full"
+            aria-label="Settings"
+            href={`/settings`}
+          >
+            <Cog className="text-default-500" />
+          </Link>
+          <Link
+            className="bg-default-100 p-2 border border-gray3 rounded-full"
+            aria-label="Notification-center"
+            href={`/settings`}
+          >
+            <Bell className="text-default-500" />
+          </Link>
+          {/* <ThemeSwitch /> */}
         </NavbarItem>
         <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
       </NavbarContent>
@@ -78,6 +101,7 @@ export const Navbar = () => {
         <Link isExternal aria-label="Github" href={siteConfig.links.github}>
           <GithubIcon className="text-default-500" />
         </Link>
+
         <ThemeSwitch />
         <NavbarMenuToggle />
       </NavbarContent>

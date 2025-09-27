@@ -7,16 +7,15 @@ import React, { useState } from "react";
 
 import { siteConfig } from "@/config/site";
 import { SidebarItem } from "./item.sidebar";
-import { Logo } from "./icons"; // فرض بر این است که این فایل موجود است
+import { Avatar, AvatarGroup } from "@heroui/avatar";
+import { Divider } from "@heroui/divider";
 
-// تایپ مخصوص آیکون‌های lucide
 type LucideIconComponent =
   | React.ForwardRefExoticComponent<
       LucideProps & React.RefAttributes<SVGSVGElement>
     >
   | undefined;
 
-// helper: از name، کامپوننت آیکون رو برمی‌گردونه (با cast امن)
 const getLucideIcon = (name?: string): LucideIconComponent => {
   if (!name) return undefined;
   const anyIcons = Icons as unknown as Record<string, unknown>;
@@ -28,16 +27,21 @@ export const Sidebar: React.FC = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
-    <aside className="bg-gray4 p-4 h-screen w-[20%]">
+    <aside className="bg-gray4 border-l border-gray3 p-4 h-screen w-[20%]">
       {/* Header */}
-      <header className="flex gap-2 items-center mb-6">
-        <Logo />
-        <p className="font-bold text-inherit">CMS</p>
-      </header>
+      <AvatarGroup className="flex gap-4 items-center mb-6">
+        <Avatar />
+        <div className="">
+          <h3 className="font-bold text-md">امیرعلی الله وردی</h3>
+          <p className="text-sm text-gray">amiraliallahverdi1@gmail</p>
+        </div>
+      </AvatarGroup>
+
+      <Divider className="mb-6" />
 
       {/* Menu */}
       <main className="flex flex-col gap-4">
-        <p className="text-sm text-gray-400">منو</p>
+        {/* <p className="text-sm text-gray-400">منو</p> */}
         <ul className="space-y-2">
           {siteConfig.navItems.map((item, i) => {
             const Icon = getLucideIcon(item.icon);

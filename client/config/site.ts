@@ -81,11 +81,6 @@ export const siteConfig = {
         },
       ],
     },
-    {
-      label: "تنظیمات",
-      icon: "Settings",
-      href: "/settings",
-    },
   ],
   links: {
     github: "https://github.com/heroui-inc/heroui",
