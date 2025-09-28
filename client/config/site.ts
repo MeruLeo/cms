@@ -1,13 +1,3 @@
-import {
-  LayoutDashboard,
-  Boxes,
-  Users,
-  ShoppingCart,
-  MessageSquare,
-  Ticket,
-  Settings,
-} from "lucide-react";
-
 export const siteConfig = {
   name: "CMS",
   description: "cms for shops",

@@ -2,10 +2,11 @@
 
 import React, { useState } from "react";
 import { usePathname } from "next/navigation";
+import Link from "next/link";
 import { Button } from "@heroui/button";
 import { ChevronDown, ChevronUp, type LucideProps } from "lucide-react";
 
-type LucideIconComponent =
+export type LucideIconComponent =
   | React.ForwardRefExoticComponent<
       LucideProps & React.RefAttributes<SVGSVGElement>
     >
@@ -45,11 +46,31 @@ const SidebarBtn: React.FC<SidebarBtnProps> = ({
   isOpen,
   active,
 }) => {
+  const btnClass = `flex bg-transparent  p-2 rounded-full items-center justify-between transition-colors duration-300 ${
+    active
+      ? "bg-gradient-to-l from-gray3 border border-gray3 text-foreground to-gray4"
+      : "text-gray"
+  }`;
+
+  const inner = (
+    <div className="flex gap-2 items-center">
+      {Icon ? <Icon className="w-5 h-5" /> : null}
+      <span>{label}</span>
+    </div>
+  );
+
+  if (isLink && href) {
+    return (
+      <Link href={href} className={`block w-full ${btnClass}`}>
+        <div className="w-full flex items-center">{inner}</div>
+      </Link>
+    );
+  }
+
   return (
     <Button
       fullWidth
-      className={`flex bg-transparent items-center justify-between transition-colors duration-300
-        ${active ? "bg-gradient-to-l from-gray3 to-gray4" : null}`}
+      className={btnClass}
       endContent={
         !isLink ? (
           isOpen ? (
@@ -59,14 +80,9 @@ const SidebarBtn: React.FC<SidebarBtnProps> = ({
           )
         ) : null
       }
-      as={isLink ? "a" : "button"}
-      href={isLink ? href : undefined}
       onPress={!isLink && click ? click : undefined}
     >
-      <div className="flex gap-2 items-center">
-        {Icon ? <Icon className="w-5 h-5" /> : null}
-        <span>{label}</span>
-      </div>
+      {inner}
     </Button>
   );
 };
@@ -77,15 +93,14 @@ const DropdownBtnItem: React.FC<{
   active: boolean;
 }> = ({ href, label, active }) => (
   <li>
-    <Button
-      as="a"
+    <Link
       href={href}
-      fullWidth
-      variant="faded"
-      className={`my-1 transition-colors duration-300`}
+      className={`block w-full my-1 transition-colors duration-300 px-2 py-1 rounded-full ${
+        active ? "bg-gradient-to-r from-gray3 to-gray4" : "hover:bg-gray3/20"
+      }`}
     >
       {label}
-    </Button>
+    </Link>
   </li>
 );
 
@@ -103,7 +118,7 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
 
   const isActive = href
     ? pathname === href
-    : items?.some((it) => pathname.startsWith(it.href));
+    : !!items?.some((it) => pathname.startsWith(it.href));
 
   if (href) {
     return (

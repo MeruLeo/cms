@@ -80,19 +80,20 @@ export const Navbar = ({ title }: { title: string }) => {
           </Link>
           <Link
             className="bg-default-100 p-2 border border-gray3 rounded-full"
-            aria-label="Settings"
-            href={`/settings`}
-          >
-            <Cog className="text-default-500" />
-          </Link>
-          <Link
-            className="bg-default-100 p-2 border border-gray3 rounded-full"
             aria-label="Notification-center"
             href={`/settings`}
           >
             <Bell className="text-default-500" />
           </Link>
-          {/* <ThemeSwitch /> */}
+          <Link
+            className="bg-default-100 p-2 border border-gray3 rounded-full"
+            aria-label="Settings"
+            href={`/settings`}
+          >
+            <Cog className="text-default-500" />
+          </Link>
+
+          <ThemeSwitch />
         </NavbarItem>
         <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
       </NavbarContent>
