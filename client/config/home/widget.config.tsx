@@ -16,7 +16,7 @@ export const widgetConfig: HeaderWidgetProps[] = [
       }) as string,
     },
     styles: {
-      bg: "bg-gradient-to-tr from-gray3 via-gray4 to-gray4",
+      bg: "bg-gray4",
       fontSize: "text-6xl",
     },
   },
@@ -34,7 +34,7 @@ export const widgetConfig: HeaderWidgetProps[] = [
       optionalValue: <TimesWidget />,
     },
     styles: {
-      bg: "bg-gradient-to-r from-gray3 via-gray4 to-gray4",
+      bg: "bg-gray4",
     },
   },
   {
@@ -53,7 +53,7 @@ export const widgetConfig: HeaderWidgetProps[] = [
     },
     styles: {
       fontSize: "text-3xl",
-      bg: "bg-gradient-to-br from-gray3 via-gray4 to-gray4",
+      bg: "bg-gray4",
     },
   },
 ];
