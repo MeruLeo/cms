@@ -7,6 +7,7 @@ import {
 } from "../types/ticket.type.type";
 import { Types } from "mongoose";
 import { AppError } from "../middlewares/errorHandler";
+import { CodeGenerator } from "../utils/codeGenerator";
 
 export const createTicket = async ({
   userId,
@@ -19,9 +20,17 @@ export const createTicket = async ({
     throw new AppError("شناسه کاربر نامعتبر است", 400);
   }
 
+  const ticketCode = CodeGenerator.generate({
+    prefix: "TIC",
+    includeDate: true,
+    length: 6,
+    onlyNumbers: true,
+  });
+
   const ticket = await TicketModel.create({
     user: userId,
     title,
+    code: ticketCode,
     description,
     category,
     priority,

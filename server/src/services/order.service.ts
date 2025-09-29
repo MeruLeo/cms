@@ -9,6 +9,7 @@ import {
 import { couponService } from "./coupon.service";
 import { Types } from "mongoose";
 import { ProductModel } from "../models/Product";
+import { CodeGenerator } from "../utils/codeGenerator";
 
 interface OrderItem {
   productId: string;
@@ -65,6 +66,13 @@ export const orderService = {
       0
     );
 
+    const orderCode = CodeGenerator.generate({
+      prefix: "ORD",
+      includeDate: true,
+      length: 6,
+      onlyNumbers: true,
+    });
+
     const order = await OrderModel.create({
       ...data,
       user: uid,
@@ -72,6 +80,7 @@ export const orderService = {
       totalAmount,
       coupon: couponDetails,
       status: OrderStatus.Pending,
+      code: orderCode,
     });
 
     for (const item of data.items) {

@@ -1,5 +1,5 @@
 export type CodeOptions = {
-  prefix?: string;
+  prefix?: "ORD" | "TIC";
   includeDate?: boolean;
   length?: number;
   onlyNumbers?: boolean;

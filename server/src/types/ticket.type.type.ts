@@ -36,6 +36,7 @@ export interface CreateTicketInput {
 export interface ITicket extends Document {
   user: Types.ObjectId;
   title: string;
+  code: string;
   description: string;
   status: TicketStatus;
   priority: TicketPriority;
