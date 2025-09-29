@@ -7,6 +7,7 @@ import { siteConfig } from "@/config/site";
 import { sfBold, sfLight, sfMed } from "@/config/fonts";
 import { Sidebar } from "@/components/sidebar";
 import { CurrentNavbar } from "@/components/currentNavLable";
+import GradualBlurMemo from "@/components/gradualBlur";
 
 export const metadata: Metadata = {
   title: {
