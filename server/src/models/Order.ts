@@ -15,6 +15,7 @@ const orderSchema = new Schema<IOrder>(
         price: { type: Number, required: true },
       },
     ],
+    code: { type: String, required: true, unique: true },
     totalAmount: { type: Number, required: true },
     status: {
       type: String,

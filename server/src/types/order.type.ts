@@ -15,6 +15,7 @@ export interface IOrder extends Document {
     quantity: number;
     price: number;
   }[];
+  code: string;
   totalAmount: number;
   status: OrderStatus;
   shippingAddress: {
