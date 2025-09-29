@@ -9,60 +9,6 @@ import React, {
   ReactNode,
 } from "react";
 import { motion, useInView } from "motion/react";
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
-import { Chip } from "@heroui/chip";
-import { formatNumber } from "@/utils/persianNumber";
-
-// ------------------- UserPreview -------------------
-interface UserPreviewProps {
-  fullName: string;
-  email: string;
-  countOfBuys: number;
-  createdAt: string;
-}
-
-export const UserPreview = ({
-  fullName,
-  email,
-  countOfBuys,
-  createdAt,
-}: UserPreviewProps) => {
-  return (
-    <li className="bg-gray3 p-3 gap-4 flex flex-col rounded-4xl">
-      <header className="flex justify-between">
-        <section>
-          <p className="text-xl font-bold mb-2">{fullName}</p>
-          <Chip variant="faded">{email}</Chip>
-        </section>
-        <section className="text-xs text-default-500">{createdAt}</section>
-      </header>
-      <main className="flex justify-between">
-        <div className="flex flex-col gap-2">
-          <p className="text-default-500 text-sm">خرید موفق</p>
-          <p className="text-default-500 text-sm">تیکت ها</p>
-        </div>
-        <div className="flex flex-col gap-2">
-          <Chip size="lg" color="success" variant="flat">
-            {formatNumber("5", "price")}
-          </Chip>
-          <Chip size="lg" color="warning" variant="flat">
-            {formatNumber("9", "price")}
-          </Chip>
-        </div>
-      </main>
-      <footer>
-        <Link
-          href={`/`}
-          className="flex justify-center items-center gap-2 bg-foreground text-background p-2 rounded-full w-full"
-        >
-          سوابق
-          <ArrowLeft />
-        </Link>
-      </footer>
-    </li>
-  );
-};
 
 // ------------------- AnimatedItem -------------------
 interface AnimatedItemProps {
@@ -82,6 +28,7 @@ const AnimatedItem: React.FC<AnimatedItemProps> = ({
 }) => {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { amount: 0.5, once: false });
+
   return (
     <motion.div
       ref={ref}
@@ -99,16 +46,10 @@ const AnimatedItem: React.FC<AnimatedItemProps> = ({
 };
 
 // ------------------- AnimatedList -------------------
-interface UserItem {
-  fullName: string;
-  email: string;
-  countOfBuys: number;
-  createdAt: string;
-}
-
-interface AnimatedListProps {
-  items: UserItem[];
-  onItemSelect?: (item: UserItem, index: number) => void;
+interface AnimatedListProps<T> {
+  items: T[];
+  renderItem: (item: T, index: number, selected: boolean) => ReactNode;
+  onItemSelect?: (item: T, index: number) => void;
   showGradients?: boolean;
   enableArrowNavigation?: boolean;
   className?: string;
@@ -116,15 +57,16 @@ interface AnimatedListProps {
   initialSelectedIndex?: number;
 }
 
-const AnimatedList: React.FC<AnimatedListProps> = ({
+function AnimatedList<T>({
   items,
+  renderItem,
   onItemSelect,
   showGradients = true,
   enableArrowNavigation = true,
   className = "",
   displayScrollbar = true,
   initialSelectedIndex = -1,
-}) => {
+}: AnimatedListProps<T>) {
   const listRef = useRef<HTMLDivElement>(null);
   const [selectedIndex, setSelectedIndex] =
     useState<number>(initialSelectedIndex);
@@ -132,6 +74,7 @@ const AnimatedList: React.FC<AnimatedListProps> = ({
   const [topGradientOpacity, setTopGradientOpacity] = useState<number>(0);
   const [bottomGradientOpacity, setBottomGradientOpacity] = useState<number>(1);
 
+  // اسکرول گرادیان
   const handleScroll = (e: UIEvent<HTMLDivElement>) => {
     const { scrollTop, scrollHeight, clientHeight } =
       e.target as HTMLDivElement;
@@ -142,6 +85,7 @@ const AnimatedList: React.FC<AnimatedListProps> = ({
     );
   };
 
+  // ناوبری با کیبورد
   useEffect(() => {
     if (!enableArrowNavigation) return;
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -156,29 +100,29 @@ const AnimatedList: React.FC<AnimatedListProps> = ({
       } else if (e.key === "Enter") {
         if (selectedIndex >= 0 && selectedIndex < items.length) {
           e.preventDefault();
-          if (onItemSelect) {
-            onItemSelect(items[selectedIndex], selectedIndex);
-          }
+          onItemSelect?.(items[selectedIndex], selectedIndex);
         }
       }
     };
-
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [items, selectedIndex, onItemSelect, enableArrowNavigation]);
 
+  // اسکرول خودکار روی آیتم انتخاب شده
   useEffect(() => {
     if (!keyboardNav || selectedIndex < 0 || !listRef.current) return;
     const container = listRef.current;
     const selectedItem = container.querySelector(
       `[data-index="${selectedIndex}"]`
     ) as HTMLElement | null;
+
     if (selectedItem) {
       const extraMargin = 50;
       const containerScrollTop = container.scrollTop;
       const containerHeight = container.clientHeight;
       const itemTop = selectedItem.offsetTop;
       const itemBottom = itemTop + selectedItem.offsetHeight;
+
       if (itemTop < containerScrollTop + extraMargin) {
         container.scrollTo({ top: itemTop - extraMargin, behavior: "smooth" });
       } else if (
@@ -198,14 +142,14 @@ const AnimatedList: React.FC<AnimatedListProps> = ({
     <div className={`relative w-full ${className}`}>
       <div
         ref={listRef}
-        className={`max-h-[400px] gap-2 flex flex-col list-none overflow-y-auto p-4 ${
+        className={`max-h-[400px] gap-2 flex flex-col overflow-y-auto p-4 ${
           displayScrollbar
             ? "[&::-webkit-scrollbar]:w-[8px] [&::-webkit-scrollbar-track]:bg-gray3 [&::-webkit-scrollbar-thumb]:bg-gray2 [&::-webkit-scrollbar-thumb]:rounded-[4px]"
             : "scrollbar-hide"
         }`}
         onScroll={handleScroll}
       >
-        {items.map((user, index) => (
+        {items.map((item, index) => (
           <AnimatedItem
             key={index}
             delay={0.1}
@@ -213,29 +157,28 @@ const AnimatedList: React.FC<AnimatedListProps> = ({
             onMouseEnter={() => setSelectedIndex(index)}
             onClick={() => {
               setSelectedIndex(index);
-              if (onItemSelect) {
-                onItemSelect(user, index);
-              }
+              onItemSelect?.(item, index);
             }}
           >
-            <UserPreview {...user} />
+            {renderItem(item, index, selectedIndex === index)}
           </AnimatedItem>
         ))}
       </div>
+
       {showGradients && (
         <>
           <div
             className="absolute top-0 left-0 right-0 h-[50px] bg-gradient-to-b from-gray4 to-transparent pointer-events-none transition-opacity duration-300 ease"
             style={{ opacity: topGradientOpacity }}
-          ></div>
+          />
           <div
             className="absolute bottom-0 left-0 right-0 h-[100px] bg-gradient-to-t from-gray4 to-transparent pointer-events-none transition-opacity duration-300 ease"
             style={{ opacity: bottomGradientOpacity }}
-          ></div>
+          />
         </>
       )}
     </div>
   );
-};
+}
 
 export default AnimatedList;
