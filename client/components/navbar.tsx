@@ -32,8 +32,16 @@ import {
   Logo,
 } from "@/components/icons";
 import { Bell, Cog, Settings, Settings2 } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 export const Navbar = ({ title }: { title: string }) => {
+  const pathname = usePathname();
+
+  const hiddenPaths = ["/auth"];
+  const isAuthRoute = hiddenPaths.some((p) => pathname.startsWith(p));
+
+  if (isAuthRoute) return null;
+
   const searchInput = (
     <Input
       aria-label="Search"

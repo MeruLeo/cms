@@ -1,9 +1,9 @@
-// components/Sidebar.tsx
 "use client";
 
 import * as Icons from "lucide-react";
 import type { LucideProps } from "lucide-react";
 import React, { useState } from "react";
+import { usePathname } from "next/navigation";
 
 import { siteConfig } from "@/config/site";
 import { SidebarItem } from "./item.sidebar";
@@ -25,6 +25,12 @@ const getLucideIcon = (name?: string): LucideIconComponent => {
 
 export const Sidebar: React.FC = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const pathname = usePathname();
+
+  const hiddenPaths = ["/auth"];
+  const isAuthRoute = hiddenPaths.some((p) => pathname.startsWith(p));
+
+  if (isAuthRoute) return null;
 
   return (
     <aside className="bg-gray4 border-l border-gray3 p-4 h-screen w-[20%]">
@@ -41,7 +47,6 @@ export const Sidebar: React.FC = () => {
 
       {/* Menu */}
       <main className="flex flex-col gap-4">
-        {/* <p className="text-sm text-gray-400">منو</p> */}
         <ul className="space-y-2">
           {siteConfig.navItems.map((item, i) => {
             const Icon = getLucideIcon(item.icon);
