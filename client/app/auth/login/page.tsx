@@ -2,9 +2,12 @@
 
 import DynamicForm, { FieldConfig } from "@/components/dynamicForm";
 import { title } from "@/components/primitives";
+import { useAuthStore } from "@/stores/auth.store";
 import { Divider } from "@heroui/divider";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { z } from "zod";
+import { Toast } from "@heroui/toast";
 
 const exampleSchema = z.object({
   identifier: z
@@ -30,12 +33,20 @@ const exampleFields: FieldConfig<FormData>[] = [
   },
 ];
 
-const handleSubmit = (data: FormData) => {
-  console.log("Form data:", data);
-  // Here, send to backend
-};
-
 export default function LogInPage() {
+  const { login } = useAuthStore();
+
+  const handleSubmit = async (data: FormData) => {
+    try {
+      await login(data);
+      // Toast("")
+      // redirect("/");
+    } catch (error: any) {
+      console.log(error);
+      alert(error.response?.data?.message || "خطا در ورود");
+    }
+  };
+
   return (
     <section className="bg-gray4 border border-gray3 w-[20rem] p-4 rounded-4xl absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2">
       <div>
