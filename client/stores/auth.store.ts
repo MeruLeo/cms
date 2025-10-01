@@ -21,6 +21,8 @@ interface AuthState {
   register: (data: RegisterPayload) => Promise<void>;
   login: (data: LoginPayload) => Promise<void>;
   logout: () => Promise<void>;
+  getCurrentUser: () => Promise<void>;
+  initialize: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -30,20 +32,16 @@ export const useAuthStore = create<AuthState>((set) => ({
   loading: false,
   error: null,
 
-  setAccessToken: (token) => {
-    set((state) => ({
-      ...state,
+  setAccessToken: (token) =>
+    set({
       accessToken: token,
       isAuthenticated: !!token,
-    }));
-  },
+    }),
 
-  setUser: (user) => {
-    set((state) => ({
-      ...state,
+  setUser: (user) =>
+    set({
       user,
-    }));
-  },
+    }),
 
   register: async (data) => {
     set({ loading: true, error: null });
@@ -68,7 +66,6 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ loading: true, error: null });
     try {
       const res = await authService.login(data);
-      console.log(res);
       set({
         user: res.data.user,
         accessToken: res.data.accessToken,
@@ -85,6 +82,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   logout: async () => {
+    set({ loading: true });
     try {
       await authService.logout();
     } catch (err) {
@@ -95,7 +93,35 @@ export const useAuthStore = create<AuthState>((set) => ({
         accessToken: null,
         isAuthenticated: false,
         loading: false,
+        error: null,
       });
+    }
+  },
+
+  getCurrentUser: async () => {
+    set({ loading: true });
+    try {
+      const res = await authService.getCurrentUser();
+      set({ user: res.data.user, loading: false });
+    } catch (err) {
+      console.error("Failed to fetch current user:", err);
+      set({ loading: false });
+    }
+  },
+
+  initialize: async () => {
+    if (!useAuthStore.getState().accessToken) {
+      set({ loading: true });
+      try {
+        const res = await authService.refreshToken();
+        set({ accessToken: res.data.accessToken, isAuthenticated: true });
+        await useAuthStore.getState().getCurrentUser();
+      } catch (err) {
+        console.error("Initialization failed:", err);
+        useAuthStore.getState().logout();
+      } finally {
+        set({ loading: false });
+      }
     }
   },
 }));

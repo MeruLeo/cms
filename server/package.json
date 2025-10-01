@@ -12,6 +12,7 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@types/jalaali-js": "^1.2.0",
     "@types/multer": "^2.0.0",
     "@types/uuid": "^10.0.0",
     "bcrypt": "^6.0.0",
@@ -21,6 +22,7 @@
     "express": "^4.21.2",
     "express-async-errors": "^3.1.1",
     "helmet": "^8.1.0",
+    "jalaali-js": "^1.2.8",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.18.1",
     "morgan": "^1.10.1",

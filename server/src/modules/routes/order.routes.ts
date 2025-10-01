@@ -5,6 +5,8 @@ import {
   getAll,
   getById,
   getByUser,
+  getRevenueByPeriodHandler,
+  getTotalRevenue,
   remove,
   updateStatus,
 } from "../controllers/order.controller";
@@ -15,10 +17,22 @@ const router = express.Router();
 router.post("/", authenticate, create);
 
 router.get("/", authenticate, requireRole(["admin"]), getAll);
+router.get(
+  "/total-revenue",
+  authenticate,
+  requireRole(["admin"]),
+  getTotalRevenue
+);
+router.get(
+  "/revenue",
+  authenticate,
+  requireRole(["admin"]),
+  getRevenueByPeriodHandler
+);
 router.get("/:id", authenticate, getById);
 router.get("/user", authenticate, getByUser);
 
-router.put("/", authenticate, requireRole(["admin"]), updateStatus);
+router.patch("/:id", authenticate, requireRole(["admin"]), updateStatus);
 
 router.delete("/", authenticate, requireRole(["admin"]), remove);
 

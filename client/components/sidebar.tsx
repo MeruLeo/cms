@@ -2,13 +2,15 @@
 
 import * as Icons from "lucide-react";
 import type { LucideProps } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 
 import { siteConfig } from "@/config/site";
 import { SidebarItem } from "./item.sidebar";
 import { Avatar, AvatarGroup } from "@heroui/avatar";
 import { Divider } from "@heroui/divider";
+import { Skeleton } from "@heroui/skeleton";
+import { useAuthStore } from "@/stores/auth.store";
 
 type LucideIconComponent =
   | React.ForwardRefExoticComponent<
@@ -24,6 +26,12 @@ const getLucideIcon = (name?: string): LucideIconComponent => {
 };
 
 export const Sidebar: React.FC = () => {
+  const { getCurrentUser, user, loading } = useAuthStore();
+
+  useEffect(() => {
+    getCurrentUser();
+  }, [getCurrentUser]);
+
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const pathname = usePathname();
 
@@ -33,15 +41,31 @@ export const Sidebar: React.FC = () => {
   if (isAuthRoute) return null;
 
   return (
-    <aside className="bg-gray4 border-l border-gray3 p-4 h-screen w-[20%]">
+    <aside className="bg-gray4 border-l border-gray3 p-4 h-screen w-[25%]">
       {/* Header */}
-      <AvatarGroup className="flex gap-4 items-center mb-6">
-        <Avatar />
-        <div className="">
-          <h3 className="font-bold text-md">امیرعلی الله وردی</h3>
-          <p className="text-sm text-gray">amiraliallahverdi1@gmail</p>
-        </div>
-      </AvatarGroup>
+      <header>
+        {user ? (
+          <>
+            <AvatarGroup className="flex gap-4 items-center mb-6">
+              <Avatar />
+              <div className="flex flex-col">
+                <h3 className="font-bold text-md">{user.fullName}</h3>
+                <p className="text-xs text-gray">{user.email}</p>
+              </div>
+            </AvatarGroup>
+          </>
+        ) : (
+          <div className="max-w-[300px] w-full flex items-center gap-3">
+            <div>
+              <Skeleton className="flex rounded-full w-12 h-12" />
+            </div>
+            <div className="w-full flex flex-col gap-2">
+              <Skeleton className="h-3 w-3/5 rounded-lg" />
+              <Skeleton className="h-3 w-4/5 rounded-lg" />
+            </div>
+          </div>
+        )}
+      </header>
 
       <Divider className="mb-6" />
 

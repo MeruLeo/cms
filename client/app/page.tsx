@@ -23,8 +23,21 @@ import {
   TicketPreview,
   TicketPreviewProps,
 } from "@/components/home/ticketPreview";
+import { formatNumber } from "@/utils/persianNumber";
+import { FooterWidget } from "@/components/home/widgets/footer";
+import { TimesWidget } from "@/components/home/widgets/times";
+import { useEffect } from "react";
+import { useOrderStore } from "@/stores/order.store";
 
 export default function Home() {
+  const { totalRevenue, fetchTotalRevenue, loading } = useOrderStore();
+
+  useEffect(() => {
+    fetchTotalRevenue();
+  }, [fetchTotalRevenue]);
+
+  const widgets = widgetConfig(totalRevenue, loading);
+
   const users = [
     {
       fullName: "علی رضایی",
@@ -131,8 +144,8 @@ export default function Home() {
     <section className="flex w-full overflow-auto h-fit flex-col items-center justify-center gap-2 py-5 px-4">
       <header className="w-full">
         <ul className="flex w-full gap-2 justify-between">
-          {widgetConfig.map((w) => (
-            <HeaderWidget key={w.header.title} {...w} />
+          {widgets.map((w, i) => (
+            <HeaderWidget key={i} {...w} />
           ))}
         </ul>
       </header>

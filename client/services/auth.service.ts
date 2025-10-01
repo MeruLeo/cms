@@ -32,4 +32,6 @@ export const authService = {
 
   logout: () =>
     apiClient.post<{ ok: boolean; message: string }>("/auth/logout"),
+
+  getCurrentUser: () => apiClient.get<{ user: IUser }>("/users/me"),
 };

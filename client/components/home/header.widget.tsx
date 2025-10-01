@@ -10,7 +10,7 @@ export interface HeaderWidgetProps {
     icon?: keyof typeof Icons;
   };
   main: {
-    value: string;
+    value: React.ReactNode;
   };
   footer?: {
     optionalValue?: React.ReactNode;

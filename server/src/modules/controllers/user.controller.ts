@@ -40,7 +40,32 @@ export const getUserById = async (
       return res.status(404).json({ message: "User not found" });
     }
 
-    return res.json(user);
+    return res.status(200).json({
+      ok: true,
+      user,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getMe = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId = req.user?.userId as string;
+    const user = await userService.findUserById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json({
+      ok: true,
+      user,
+    });
   } catch (error) {
     next(error);
   }

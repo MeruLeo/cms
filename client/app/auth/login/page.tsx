@@ -5,9 +5,9 @@ import { title } from "@/components/primitives";
 import { useAuthStore } from "@/stores/auth.store";
 import { Divider } from "@heroui/divider";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { z } from "zod";
-import { Toast } from "@heroui/toast";
+import { addToast, Toast } from "@heroui/toast";
 
 const exampleSchema = z.object({
   identifier: z
@@ -34,13 +34,18 @@ const exampleFields: FieldConfig<FormData>[] = [
 ];
 
 export default function LogInPage() {
+  const router = useRouter();
+
   const { login } = useAuthStore();
 
   const handleSubmit = async (data: FormData) => {
     try {
       await login(data);
-      // Toast("")
-      // redirect("/");
+      addToast({
+        title: "با موفقیت وارد شدید",
+        color: "success",
+      });
+      router.push("/");
     } catch (error: any) {
       console.log(error);
       alert(error.response?.data?.message || "خطا در ورود");

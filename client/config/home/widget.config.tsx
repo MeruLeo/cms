@@ -2,18 +2,28 @@ import { HeaderWidgetProps } from "@/components/home/header.widget";
 import { formatNumber } from "@/utils/persianNumber";
 import { FooterWidget } from "@/components/home/widgets/footer";
 import { TimesWidget } from "@/components/home/widgets/times";
+import { Skeleton } from "@heroui/skeleton";
 
-export const widgetConfig: HeaderWidgetProps[] = [
+export const widgetConfig = (
+  totalRevenue: number,
+  periodRevenue: number,
+  loading: boolean
+): HeaderWidgetProps[] => [
   {
     header: {
       icon: "Wallet",
       title: "کل سرمایه",
-      optionalValue: "",
     },
     main: {
-      value: formatNumber("20000000", "price", {
-        wrapWithLTR: false,
-      }) as string,
+      value: loading ? (
+        <Skeleton className="h-3 w-4/5 rounded-lg" />
+      ) : (
+        `
+        ${formatNumber(totalRevenue, "price", {
+          wrapWithLTR: false,
+        })} ت
+        `
+      ),
     },
     styles: {
       bg: "bg-gray4",
@@ -26,13 +36,15 @@ export const widgetConfig: HeaderWidgetProps[] = [
       title: "میزان فروش",
     },
     main: {
-      value: formatNumber("20000000", "price", {
-        wrapWithLTR: false,
-      }) as string,
+      value: loading ? (
+        <Skeleton className="h-3 w-4/5 rounded-lg" />
+      ) : (
+        <TimesWidget />
+      ),
     },
-    footer: {
-      optionalValue: <TimesWidget />,
-    },
+    // footer: {
+    //   optionalValue: ,
+    // },
     styles: {
       bg: "bg-gray4",
     },
@@ -41,7 +53,6 @@ export const widgetConfig: HeaderWidgetProps[] = [
     header: {
       icon: "CreditCard",
       title: "شماره کارت",
-      optionalValue: "",
     },
     main: {
       value: formatNumber("6037000000000000", "card", {

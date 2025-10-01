@@ -2,6 +2,7 @@
 
 import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 import { useAuthStore } from "@/stores/auth.store";
+import { authService } from "@/services/auth.service"; // Import to use refreshToken
 
 const apiClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000",
@@ -28,7 +29,8 @@ const processQueue = (error: any, token: string | null = null) => {
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const token = useAuthStore.getState().accessToken;
-    if (token) {
+    if (token && !config.url?.includes("/auth/refresh")) {
+      // Avoid adding header to refresh
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
@@ -39,14 +41,22 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
-    const originalRequest: any = error.config;
+    const originalRequest = error.config as InternalAxiosRequestConfig & {
+      _retry?: boolean;
+    };
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !originalRequest.url?.includes("/auth/refresh")
+    ) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({
             resolve: (token: string) => {
-              originalRequest.headers.Authorization = "Bearer " + token;
+              if (originalRequest.headers) {
+                originalRequest.headers.Authorization = `Bearer ${token}`;
+              }
               resolve(apiClient(originalRequest));
             },
             reject: (err) => {
@@ -60,19 +70,17 @@ apiClient.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const { data } = await axios.post(
-          `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`,
-          {},
-          { withCredentials: true }
-        );
-
-        const newAccessToken = (data as any).accessToken;
+        const { data } = await authService.refreshToken(); // Use service for consistency
+        const newAccessToken = data.accessToken;
 
         useAuthStore.getState().setAccessToken(newAccessToken);
+        await useAuthStore.getState().getCurrentUser(); // Fetch user after refresh
 
         processQueue(null, newAccessToken);
 
-        originalRequest.headers.Authorization = "Bearer " + newAccessToken;
+        if (originalRequest.headers) {
+          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        }
         return apiClient(originalRequest);
       } catch (err) {
         processQueue(err, null);

@@ -139,3 +139,35 @@ export const remove = async (
     next(error);
   }
 };
+
+export const getTotalRevenue = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const totalRevenue = await orderService.getTotalRevenue();
+    return res.status(200).json({ total: totalRevenue });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getRevenueByPeriodHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { period } = req.query;
+    if (!period) {
+      throw new AppError("Period is required", 400);
+    }
+
+    const total = await orderService.getRevenueByPeriod(period as any);
+
+    res.json({ total });
+  } catch (err) {
+    next(err);
+  }
+};
