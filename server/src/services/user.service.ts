@@ -1,4 +1,4 @@
-import { FilterQuery } from "mongoose";
+import { FilterQuery, UpdateQuery } from "mongoose";
 import { UserModel } from "../models/User";
 import { IUser } from "../types/user.type";
 
@@ -67,4 +67,34 @@ export const findUsers = async ({
 
 export const findUserById = async (id: string) => {
   return UserModel.findById(id).select("-password -__v");
+};
+
+export const updateUser = async (id: string, data: UpdateQuery<IUser>) => {
+  return UserModel.findByIdAndUpdate(id, data, {
+    new: true,
+    runValidators: true,
+  }).select("-password -__v");
+};
+
+export const deleteUser = async (id: string) => {
+  return UserModel.findByIdAndDelete(id);
+};
+
+export const changeUserStatus = async (id: string, status: string) => {
+  return UserModel.findByIdAndUpdate(
+    id,
+    { status },
+    { new: true, runValidators: true }
+  ).select("-password -__v");
+};
+
+export const changeUserPassword = async (
+  id: string,
+  hashedPassword: string
+) => {
+  return UserModel.findByIdAndUpdate(
+    id,
+    { password: hashedPassword },
+    { new: true }
+  );
 };

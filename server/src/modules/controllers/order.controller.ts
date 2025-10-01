@@ -36,6 +36,22 @@ export const getByUser = async (
   }
 };
 
+export const getByAnotherUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { userId } = req.params;
+    if (!userId) return next(new AppError("User not authenticated", 401));
+
+    const orders = await orderService.getOrdersByUser(userId);
+    return res.json(orders);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getById = async (
   req: Request,
   res: Response,
@@ -169,5 +185,21 @@ export const getRevenueByPeriodHandler = async (
     res.json({ total });
   } catch (err) {
     next(err);
+  }
+};
+
+export const getMonthlySalesHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const yearParam = req.query.year;
+    const year =
+      typeof yearParam === "string" ? parseInt(yearParam, 10) : undefined;
+    const data = await orderService.getMonthlySalesJalali(year);
+    res.json(data);
+  } catch (error) {
+    next(error);
   }
 };

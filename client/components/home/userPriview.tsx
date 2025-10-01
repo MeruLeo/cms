@@ -8,21 +8,14 @@ import Link from "next/link";
 interface UserPreviewProps {
   fullName: string;
   email: string;
-  countOfBuys: number;
-  createdAt: string;
-}
-
-interface UserPreviewProps {
-  fullName: string;
-  email: string;
-  countOfBuys: number;
-  createdAt: string;
+  // countOfBuys: number;
+  createdAt: any;
 }
 
 export const UserPreview = ({
   fullName,
   email,
-  countOfBuys,
+  // countOfBuys,
   createdAt,
 }: UserPreviewProps) => {
   return (
@@ -32,13 +25,15 @@ export const UserPreview = ({
           <p className="text-xl font-bold mb-2">{fullName}</p>
           <Chip variant="faded">{email}</Chip>
         </section>
-        <section className="text-xs text-default-500">{createdAt}</section>
+        <section className="text-xs text-default-500">
+          {formatNumber(createdAt, "date")}
+        </section>
       </header>
       <main className="flex justify-between">
-        <div className="flex flex-col gap-2">
+        {/* <div className="flex flex-col gap-2">
           <p className="text-default-500 text-sm">خرید موفق</p>
           <p className="text-default-500 text-sm">تیکت ها</p>
-        </div>
+        </div> */}
         <div className="flex flex-col gap-2">
           <Chip size="lg" color="success" variant="flat">
             {formatNumber("5", "price")}

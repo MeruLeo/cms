@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Tabs, Tab } from "@heroui/tabs";
-import { useOrderStore } from "@/stores/order.store";
 import { Skeleton } from "@heroui/skeleton";
 import { formatNumber } from "@/utils/persianNumber";
 
@@ -25,16 +24,17 @@ const timesWidgetTime = [
   },
 ];
 
-export const TimesWidget = () => {
-  const { periodRevenue, fetchPeriodRevenue, loading } = useOrderStore();
-  const [selected, setSelected] = useState<"day" | "week" | "month" | "year">(
-    "day"
-  );
-
-  useEffect(() => {
-    fetchPeriodRevenue(selected);
-  }, [selected, fetchPeriodRevenue]);
-
+export const TimesWidget = ({
+  periodRevenue,
+  loading,
+  selected,
+  onChange,
+}: {
+  periodRevenue: number;
+  loading: boolean;
+  selected: "day" | "week" | "month" | "year"; // 🔥 کنترل کامل از والد
+  onChange: (value: "day" | "week" | "month" | "year") => void;
+}) => {
   return (
     <div className="">
       <Tabs
@@ -43,7 +43,7 @@ export const TimesWidget = () => {
         fullWidth
         selectedKey={selected}
         onSelectionChange={(key) =>
-          setSelected(key as "day" | "week" | "month" | "year")
+          onChange(key as "day" | "week" | "month" | "year")
         }
       >
         {timesWidgetTime.map((time) => (

@@ -237,4 +237,59 @@ export const orderService = {
 
     return result[0]?.total || 0;
   },
+
+  async getMonthlySalesJalali(year?: number) {
+    const now = new Date();
+    const jalaliNow = jalaali.toJalaali(
+      now.getFullYear(),
+      now.getMonth() + 1,
+      now.getDate()
+    );
+    const targetYear = year || jalaliNow.jy;
+
+    const startGreg = jalaali.toGregorian(targetYear, 1, 1);
+    const startDate = new Date(
+      Date.UTC(startGreg.gy, startGreg.gm - 1, startGreg.gd, 0, 0, 0)
+    );
+
+    const endGreg = jalaali.toGregorian(targetYear, 12, 29);
+    const endDate = new Date(
+      Date.UTC(endGreg.gy, endGreg.gm - 1, endGreg.gd, 23, 59, 59)
+    );
+
+    const orders = await OrderModel.aggregate([
+      {
+        $match: {
+          status: { $in: [OrderStatus.Delivered, OrderStatus.Paid] },
+          createdAt: { $gte: startDate, $lte: endDate },
+        },
+      },
+      {
+        $project: {
+          createdAt: 1,
+        },
+      },
+    ]);
+
+    const monthlySales: { [key: number]: number } = {};
+
+    for (let i = 1; i <= 12; i++) {
+      monthlySales[i] = 0;
+    }
+
+    for (const order of orders) {
+      const createdAt = new Date(order.createdAt);
+      const jDate = jalaali.toJalaali(
+        createdAt.getFullYear(),
+        createdAt.getMonth() + 1,
+        createdAt.getDate()
+      );
+      monthlySales[jDate.jm] = (monthlySales[jDate.jm] || 0) + 1;
+    }
+
+    return Object.keys(monthlySales).map((month) => ({
+      month: parseInt(month),
+      sales: monthlySales[parseInt(month)],
+    }));
+  },
 };

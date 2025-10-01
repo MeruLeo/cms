@@ -17,11 +17,19 @@ export interface OrderResponse {
   order: IOrder;
 }
 
+export interface MonthlySalesResponse {
+  month: number;
+  sales: number;
+}
+
 export const orderService = {
   createOrder: (data: CreateOrderPayload) =>
     apiClient.post<OrderResponse>("/orders", data),
 
   getMyOrders: () => apiClient.get<{ orders: IOrder[] }>("/orders/user"),
+
+  getAnotherOrders: (userId: string) =>
+    apiClient.get<{ orders: IOrder[] }>(`/orders/user/${userId}`),
 
   getAllOrders: () => apiClient.get<{ orders: IOrder[] }>("/orders"),
 
@@ -39,4 +47,7 @@ export const orderService = {
 
   getRevenueByPeriod: (period: "day" | "week" | "month" | "year") =>
     apiClient.get<{ total: number }>(`/orders/revenue?period=${period}`),
+
+  getMonthlySalesHandler: (year?: number) =>
+    apiClient.get<MonthlySalesResponse[]>(`/orders/monthly-sales?year=${year}`),
 };

@@ -26,50 +26,49 @@ import {
 import { formatNumber } from "@/utils/persianNumber";
 import { FooterWidget } from "@/components/home/widgets/footer";
 import { TimesWidget } from "@/components/home/widgets/times";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useOrderStore } from "@/stores/order.store";
+import { useUserStore } from "@/stores/user.store";
 
 export default function Home() {
-  const { totalRevenue, fetchTotalRevenue, loading } = useOrderStore();
+  const { fetchAllUsers, users, loading: usersLoading } = useUserStore();
+  const {
+    totalRevenue,
+    totalRevenueLoading,
+    fetchTotalRevenue,
+    periodRevenue,
+    periodRevenueLoading,
+    fetchPeriodRevenue,
+    loading,
+  } = useOrderStore();
+
+  const [selectedPeriod, setSelectedPeriod] = useState<
+    "day" | "week" | "month" | "year"
+  >("day");
 
   useEffect(() => {
     fetchTotalRevenue();
   }, [fetchTotalRevenue]);
+  useEffect(() => {
+    fetchPeriodRevenue(selectedPeriod);
+  }, [fetchPeriodRevenue, selectedPeriod]);
+  useEffect(() => {
+    fetchAllUsers();
+  }, [fetchAllUsers]);
 
-  const widgets = widgetConfig(totalRevenue, loading);
+  const handlePeriodChange = (period: "day" | "week" | "month" | "year") => {
+    setSelectedPeriod(period);
+  };
 
-  const users = [
-    {
-      fullName: "علی رضایی",
-      email: "ali@example.com",
-      countOfBuys: 12,
-      createdAt: "1402/07/01",
-    },
-    {
-      fullName: "مریم محمدی",
-      email: "maryam@example.com",
-      countOfBuys: 5,
-      createdAt: "1401/12/10",
-    },
-    {
-      fullName: "مریم محمدی",
-      email: "maryam@example.com",
-      countOfBuys: 5,
-      createdAt: "1401/12/10",
-    },
-    {
-      fullName: "مریم محمدی",
-      email: "maryam@example.com",
-      countOfBuys: 5,
-      createdAt: "1401/12/10",
-    },
-    {
-      fullName: "مریم محمدی",
-      email: "maryam@example.com",
-      countOfBuys: 5,
-      createdAt: "1401/12/10",
-    },
-  ];
+  const widgets = widgetConfig(
+    totalRevenue,
+    totalRevenueLoading,
+    loading,
+    periodRevenue,
+    periodRevenueLoading,
+    selectedPeriod,
+    handlePeriodChange
+  );
 
   const orders: OrderPreviewProps[] = [
     {
@@ -182,7 +181,7 @@ export default function Home() {
           </header>
           <AnimatedList
             items={users}
-            renderItem={(user, index, selected) => <UserPreview {...user} />}
+            renderItem={(user, index) => <UserPreview {...user} key={index} />}
             onItemSelect={(user) => console.log("انتخاب شد:", user)}
             displayScrollbar={false}
           />

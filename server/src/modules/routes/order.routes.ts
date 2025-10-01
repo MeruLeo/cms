@@ -3,8 +3,10 @@ import { authenticate } from "../../middlewares/auth";
 import {
   create,
   getAll,
+  getByAnotherUser,
   getById,
   getByUser,
+  getMonthlySalesHandler,
   getRevenueByPeriodHandler,
   getTotalRevenue,
   remove,
@@ -29,8 +31,20 @@ router.get(
   requireRole(["admin"]),
   getRevenueByPeriodHandler
 );
+router.get(
+  "/monthly-sales",
+  authenticate,
+  requireRole(["admin"]),
+  getMonthlySalesHandler
+);
 router.get("/:id", authenticate, getById);
 router.get("/user", authenticate, getByUser);
+router.get(
+  "/user/:userId",
+  authenticate,
+  requireRole(["admin"]),
+  getByAnotherUser
+);
 
 router.patch("/:id", authenticate, requireRole(["admin"]), updateStatus);
 

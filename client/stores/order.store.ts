@@ -1,14 +1,21 @@
 "use client";
 
 import { create } from "zustand";
-import { orderService, CreateOrderPayload } from "@/services/order.service";
+import {
+  orderService,
+  CreateOrderPayload,
+  MonthlySalesResponse,
+} from "@/services/order.service";
 import { IOrder, OrderStatus } from "@/types/order.type";
 
 interface OrderState {
   orders: IOrder[];
   selectedOrder: IOrder | null;
   totalRevenue: number;
+  totalRevenueLoading: boolean;
   periodRevenue: number;
+  periodRevenueLoading: boolean;
+  monthlySales: MonthlySalesResponse[];
   loading: boolean;
   error: string | null;
 
@@ -17,6 +24,7 @@ interface OrderState {
   setSelectedOrder: (order: IOrder | null) => void;
 
   fetchMyOrders: () => Promise<void>;
+  fetchAnotherUserOrders: () => Promise<void>;
   fetchAllOrders: () => Promise<void>;
   fetchOrderById: (id: string) => Promise<void>;
   createOrder: (data: CreateOrderPayload) => Promise<void>;
@@ -26,13 +34,17 @@ interface OrderState {
   fetchPeriodRevenue: (
     period: "day" | "week" | "month" | "year"
   ) => Promise<void>;
+  fetchMonthlySales: (yaer?: number) => Promise<void>;
 }
 
 export const useOrderStore = create<OrderState>((set) => ({
   orders: [],
   selectedOrder: null,
   totalRevenue: 0,
+  totalRevenueLoading: false,
   periodRevenue: 0,
+  periodRevenueLoading: false,
+  monthlySales: [],
   loading: false,
   error: null,
 
@@ -128,23 +140,36 @@ export const useOrderStore = create<OrderState>((set) => ({
   },
 
   fetchTotalRevenue: async () => {
-    set({ loading: true, error: null });
+    set({ totalRevenueLoading: true, error: null });
     try {
       const res = await orderService.getTotalRevenue();
-      set({ totalRevenue: res.data.total, loading: false });
+      set({ totalRevenue: res.data.total, totalRevenueLoading: false });
     } catch (err: any) {
       set({
         error: err.response?.data?.message || "Failed to fetch revenue",
-        loading: false,
+        totalRevenueLoading: false,
       });
     }
   },
 
   fetchPeriodRevenue: async (period) => {
-    set({ loading: true, error: null });
+    set({ periodRevenueLoading: true, error: null });
     try {
       const res = await orderService.getRevenueByPeriod(period);
-      set({ periodRevenue: res.data.total, loading: false });
+      set({ periodRevenue: res.data.total, periodRevenueLoading: false });
+    } catch (err: any) {
+      set({
+        error: err.response?.data?.message || "Failed to fetch revenue",
+        periodRevenueLoading: false,
+      });
+    }
+  },
+
+  fetchMonthlySales: async (year) => {
+    set({ loading: true, error: null });
+    try {
+      const res = await orderService.getMonthlySalesHandler(year);
+      set({ monthlySales: res.data, loading: false });
     } catch (err: any) {
       set({
         error: err.response?.data?.message || "Failed to fetch revenue",

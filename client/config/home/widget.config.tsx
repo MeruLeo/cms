@@ -6,8 +6,12 @@ import { Skeleton } from "@heroui/skeleton";
 
 export const widgetConfig = (
   totalRevenue: number,
+  totalRevenueLoading: boolean,
+  loading: boolean,
   periodRevenue: number,
-  loading: boolean
+  periodRevenueLoading: boolean,
+  selectedPeriod: "day" | "week" | "month" | "year",
+  onChange: (value: "day" | "week" | "month" | "year") => void
 ): HeaderWidgetProps[] => [
   {
     header: {
@@ -15,7 +19,7 @@ export const widgetConfig = (
       title: "کل سرمایه",
     },
     main: {
-      value: loading ? (
+      value: totalRevenueLoading ? (
         <Skeleton className="h-3 w-4/5 rounded-lg" />
       ) : (
         `
@@ -36,15 +40,17 @@ export const widgetConfig = (
       title: "میزان فروش",
     },
     main: {
-      value: loading ? (
+      value: periodRevenueLoading ? (
         <Skeleton className="h-3 w-4/5 rounded-lg" />
       ) : (
-        <TimesWidget />
+        <TimesWidget
+          loading={loading}
+          periodRevenue={periodRevenue}
+          selected={selectedPeriod}
+          onChange={onChange}
+        />
       ),
     },
-    // footer: {
-    //   optionalValue: ,
-    // },
     styles: {
       bg: "bg-gray4",
     },
