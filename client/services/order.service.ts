@@ -31,6 +31,9 @@ export const orderService = {
   getAnotherOrders: (userId: string) =>
     apiClient.get<{ orders: IOrder[] }>(`/orders/user/${userId}`),
 
+  getOrdersCountByUser: (userId: string) =>
+    apiClient.get<{ count: number }>(`/orders/user/${userId}/count`),
+
   getAllOrders: () => apiClient.get<{ orders: IOrder[] }>("/orders"),
 
   getOrderById: (orderId: string) =>

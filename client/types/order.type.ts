@@ -8,7 +8,12 @@ export enum OrderStatus {
 
 export interface IOrder {
   _id: string;
-  user: string;
+  user: {
+    _id: string;
+    fullName: string;
+    username: string;
+    email: string;
+  };
   items: {
     product: string;
     quantity: number;

@@ -9,7 +9,12 @@ export enum OrderStatus {
 }
 
 export interface IOrder extends Document {
-  user: Types.ObjectId;
+  user: {
+    _id: Types.ObjectId;
+    fullName: string;
+    username: string;
+    email: string;
+  };
   items: {
     product: Types.ObjectId;
     quantity: number;

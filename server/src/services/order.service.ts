@@ -113,6 +113,10 @@ export const orderService = {
       .lean();
   },
 
+  async countOrdersByUser(userId: string) {
+    if (!Types.ObjectId.isValid(userId)) return 0;
+    return await OrderModel.countDocuments({ user: userId });
+  },
   async updateOrderStatus(orderId: string, status: OrderStatus) {
     if (!Types.ObjectId.isValid(orderId)) return null;
     return await OrderModel.findByIdAndUpdate(

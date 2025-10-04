@@ -14,7 +14,7 @@ export const getAll = async (
 ) => {
   try {
     const orders = await orderService.getAllOrders();
-    return res.json(orders);
+    return res.json({ orders });
   } catch (error) {
     next(error);
   }
@@ -47,6 +47,22 @@ export const getByAnotherUser = async (
 
     const orders = await orderService.getOrdersByUser(userId);
     return res.json(orders);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getOrdersCountByUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { userId } = req.params;
+    if (!userId) return next(new AppError("User not authenticated", 401));
+
+    const count = await orderService.countOrdersByUser(userId);
+    return res.json({ count });
   } catch (error) {
     next(error);
   }

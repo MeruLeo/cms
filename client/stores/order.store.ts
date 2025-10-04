@@ -16,6 +16,7 @@ interface OrderState {
   periodRevenue: number;
   periodRevenueLoading: boolean;
   monthlySales: MonthlySalesResponse[];
+  countOrdersByUser: number;
   loading: boolean;
   error: string | null;
 
@@ -24,7 +25,8 @@ interface OrderState {
   setSelectedOrder: (order: IOrder | null) => void;
 
   fetchMyOrders: () => Promise<void>;
-  fetchAnotherUserOrders: () => Promise<void>;
+  fetchAnotherUserOrders: (userId: string) => Promise<void>;
+  fetchCountOrdersByUser: (userId: string) => Promise<void>;
   fetchAllOrders: () => Promise<void>;
   fetchOrderById: (id: string) => Promise<void>;
   createOrder: (data: CreateOrderPayload) => Promise<void>;
@@ -45,6 +47,7 @@ export const useOrderStore = create<OrderState>((set) => ({
   periodRevenue: 0,
   periodRevenueLoading: false,
   monthlySales: [],
+  countOrdersByUser: 0,
   loading: false,
   error: null,
 
@@ -64,10 +67,38 @@ export const useOrderStore = create<OrderState>((set) => ({
     }
   },
 
+  fetchAnotherUserOrders: async (userId) => {
+    set({ loading: true, error: null });
+    try {
+      const res = await orderService.getAnotherOrders(userId);
+      set({ orders: res.data.orders, loading: false });
+    } catch (err: any) {
+      set({
+        error: err.response?.data?.message || "Failed to fetch user orders",
+        loading: false,
+      });
+    }
+  },
+
+  fetchCountOrdersByUser: async (userId) => {
+    set({ loading: true, error: null });
+    try {
+      const res = await orderService.getOrdersCountByUser(userId);
+      set({ countOrdersByUser: res.data.count, loading: false });
+    } catch (err: any) {
+      set({
+        error: err.response?.data?.message || "Failed to fetch user orders",
+        loading: false,
+      });
+    }
+  },
+
   fetchAllOrders: async () => {
     set({ loading: true, error: null });
     try {
       const res = await orderService.getAllOrders();
+      console.log(res.data.orders, Array.isArray(res.data.orders));
+
       set({ orders: res.data.orders, loading: false });
     } catch (err: any) {
       set({

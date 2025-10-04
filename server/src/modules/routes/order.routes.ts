@@ -7,6 +7,7 @@ import {
   getById,
   getByUser,
   getMonthlySalesHandler,
+  getOrdersCountByUser,
   getRevenueByPeriodHandler,
   getTotalRevenue,
   remove,
@@ -44,6 +45,12 @@ router.get(
   authenticate,
   requireRole(["admin"]),
   getByAnotherUser
+);
+router.get(
+  "/user/:userId/count",
+  authenticate,
+  requireRole(["admin"]),
+  getOrdersCountByUser
 );
 
 router.patch("/:id", authenticate, requireRole(["admin"]), updateStatus);

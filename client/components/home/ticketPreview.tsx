@@ -1,6 +1,5 @@
 "use client";
 
-import { formatNumber } from "@/utils/persianNumber";
 import { Chip } from "@heroui/chip";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
@@ -8,17 +7,14 @@ import Link from "next/link";
 export interface TicketPreviewProps {
   fullName: string;
   code: string;
-  status: "open" | "in_progress" | "closed";
-  category: "order" | "payment" | "technical" | "general";
+  status: "open" | "in_progress" | "closed" | string; // اضافه کردن string برای انعطاف
+  category: "order" | "payment" | "technical" | "general" | string;
   createdAt: string;
 }
 
 const statusMap: Record<
   TicketPreviewProps["status"],
-  {
-    label: string;
-    color: "warning" | "danger" | "primary";
-  }
+  { label: string; color: "warning" | "danger" | "primary" }
 > = {
   open: { label: "پاسخ داده نشده", color: "warning" },
   in_progress: { label: "در حال صحبت", color: "primary" },
@@ -27,10 +23,7 @@ const statusMap: Record<
 
 const categoryMap: Record<
   TicketPreviewProps["category"],
-  {
-    labelC: string;
-    colorC: "warning" | "success" | "primary" | "secondary";
-  }
+  { labelC: string; colorC: "warning" | "success" | "primary" | "secondary" }
 > = {
   order: { labelC: "پیگیری سفارش", colorC: "warning" },
   payment: { labelC: "مالی", colorC: "success" },
@@ -45,8 +38,15 @@ export const TicketPreview = ({
   status,
   createdAt,
 }: TicketPreviewProps) => {
-  const { label, color } = statusMap[status];
-  const { labelC, colorC } = categoryMap[category];
+  const { label, color } = statusMap[status] ?? {
+    label: "نامشخص",
+    color: "danger",
+  };
+
+  const { labelC, colorC } = categoryMap[category] ?? {
+    labelC: "نامشخص",
+    colorC: "secondary",
+  };
 
   return (
     <li className="bg-gray3 p-3 gap-4 flex flex-col rounded-4xl">
