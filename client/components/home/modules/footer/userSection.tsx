@@ -5,8 +5,11 @@ import Link from "next/link";
 import AnimatedList from "@/components/animatedList";
 import { UserPreview } from "@/components/home/userPriview";
 import { IUser } from "@/types/user.type";
+import { useOrderStore } from "@/stores/order.store";
 
 export function UsersSection({ users }: { users: IUser[] }) {
+  const { countOrdersByUser } = useOrderStore();
+
   return (
     <section className="bg-gray4 w-full p-4 rounded-4xl">
       <header className="flex justify-between items-center">
@@ -25,7 +28,11 @@ export function UsersSection({ users }: { users: IUser[] }) {
       <AnimatedList
         items={users}
         renderItem={(user, index) => (
-          <UserPreview countOfBuys={6} {...user} key={index} />
+          <UserPreview
+            countOfBuys={countOrdersByUser[user._id]}
+            {...user}
+            key={index}
+          />
         )}
         onItemSelect={(user) => console.log("انتخاب شد:", user)}
         displayScrollbar={false}

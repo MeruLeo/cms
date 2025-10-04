@@ -18,6 +18,8 @@ export default function HomePage() {
     periodRevenue,
     periodRevenueLoading,
     fetchPeriodRevenue,
+    countOrdersByUser,
+    fetchCountOrdersByUser,
     loading,
     orders,
   } = useOrderStore();
@@ -38,6 +40,14 @@ export default function HomePage() {
   useEffect(() => {
     fetchPeriodRevenue(selectedPeriod);
   }, []);
+
+  useEffect(() => {
+    if (users.length > 0) {
+      users.forEach((user) => {
+        fetchCountOrdersByUser(user._id);
+      });
+    }
+  }, [users]);
 
   const handlePeriodChange = (period: "day" | "week" | "month" | "year") => {
     setSelectedPeriod(period);
