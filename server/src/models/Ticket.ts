@@ -5,7 +5,7 @@ import {
   TicketCategory,
   TicketPriority,
   TicketStatus,
-} from "../types/ticket.type.type";
+} from "../types/ticket.type";
 
 const TicketMessageSchema = new Schema<ITicketMessage>(
   {

@@ -21,12 +21,12 @@ router.get("/:id", authenticate, requireRole(["admin", "user"]), getTicketById);
 router.post("/:id", authenticate, addMessageToTicket);
 
 router.patch(
-  "/status/:id",
+  "/:id/status",
   authenticate,
   requireRole(["admin"]),
   updateTicketStatus
 );
-router.patch("/priority/:id", authenticate, updateTicketPriority);
+router.patch("/:id/priority", authenticate, updateTicketPriority);
 
 router.delete("/:id", authenticate, requireRole(["admin"]), deleteTicket);
 export default router;

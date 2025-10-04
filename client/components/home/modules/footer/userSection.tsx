@@ -29,7 +29,7 @@ export function UsersSection({ users }: { users: IUser[] }) {
         items={users}
         renderItem={(user, index) => (
           <UserPreview
-            countOfBuys={countOrdersByUser[user._id]}
+            countOfBuys={countOrdersByUser[user._id] ?? 0}
             {...user}
             key={index}
           />
