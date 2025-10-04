@@ -33,7 +33,12 @@ export interface CreateTicketInput {
 
 export interface ITicket {
   _id: string;
-  user: string;
+  user: {
+    _id: string;
+    fullName: string;
+    username: string;
+    email: string;
+  };
   title: string;
   code: string;
   description: string;

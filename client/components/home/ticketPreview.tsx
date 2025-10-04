@@ -5,11 +5,12 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
 export interface TicketPreviewProps {
+  title: string;
   fullName: string;
   code: string;
-  status: "open" | "in_progress" | "closed" | string; // اضافه کردن string برای انعطاف
+  status: "open" | "in_progress" | "closed" | string;
   category: "order" | "payment" | "technical" | "general" | string;
-  createdAt: string;
+  createdAt: any;
 }
 
 const statusMap: Record<
@@ -32,6 +33,7 @@ const categoryMap: Record<
 };
 
 export const TicketPreview = ({
+  title,
   fullName,
   code,
   category,
@@ -48,16 +50,21 @@ export const TicketPreview = ({
     colorC: "secondary",
   };
 
+  const createdStr = createdAt
+    ? new Date(createdAt).toLocaleString("fa-IR")
+    : "";
+
   return (
     <li className="bg-gray3 p-3 gap-4 flex flex-col rounded-4xl">
-      <header className="flex justify-between">
+      <header className="flex flex-col justify-between">
+        <section className="text-xs text-default-500">{createdStr}</section>
         <section>
-          <p className="text-xl font-bold mb-2">{code}</p>
+          <p className="text-xl font-bold mb-2">{title}</p>
+          <p className="text-sm mb-2 text-gray">{code}</p>
           <Chip variant="flat" color={color}>
             {label}
           </Chip>
         </section>
-        <section className="text-xs text-default-500">{createdAt}</section>
       </header>
       <main className="flex justify-between">
         <div className="flex flex-col gap-2">

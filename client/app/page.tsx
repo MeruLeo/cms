@@ -7,6 +7,7 @@ import { useUserStore } from "@/stores/user.store";
 import { HeaderSection } from "@/components/home/modules/headerSection";
 import { MainSection } from "@/components/home/modules/mainSection";
 import { FooterSection } from "@/components/home/modules/footerSection";
+import { useTicketStore } from "@/stores/ticket.store";
 
 export default function HomePage() {
   const { fetchAllUsers, users } = useUserStore();
@@ -23,6 +24,7 @@ export default function HomePage() {
     loading,
     orders,
   } = useOrderStore();
+  const { fetchAllTickets, tickets } = useTicketStore();
 
   const [selectedPeriod, setSelectedPeriod] = useState<
     "day" | "week" | "month" | "year"
@@ -31,6 +33,7 @@ export default function HomePage() {
   useEffect(() => {
     fetchAllOrders();
     fetchAllUsers();
+    fetchAllTickets();
   }, []);
 
   useEffect(() => {
@@ -67,7 +70,7 @@ export default function HomePage() {
     <section className="flex w-full overflow-auto h-fit flex-col items-center justify-center gap-2 py-5 px-4">
       <HeaderSection widgets={widgets} />
       <MainSection />
-      <FooterSection users={users} orders={orders} />
+      <FooterSection users={users} orders={orders} tickets={tickets} />
     </section>
   );
 }

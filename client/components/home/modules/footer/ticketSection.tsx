@@ -7,39 +7,9 @@ import {
   TicketPreview,
   TicketPreviewProps,
 } from "@/components/home/ticketPreview";
+import { ITicket } from "@/types/ticket.type";
 
-const tickets: TicketPreviewProps[] = [
-  {
-    category: "general",
-    code: "Af56L",
-    createdAt: "1404/07/22",
-    fullName: "هستی اثنی عشری",
-    status: "closed",
-  },
-  {
-    category: "order",
-    code: "Af56L",
-    createdAt: "1404/07/22",
-    fullName: "هستی اثنی عشری",
-    status: "in_progress",
-  },
-  {
-    category: "payment",
-    code: "Af56L",
-    createdAt: "1404/07/22",
-    fullName: "هستی اثنی عشری",
-    status: "open",
-  },
-  {
-    category: "technical",
-    code: "Af56L",
-    createdAt: "1404/07/22",
-    fullName: "هستی اثنی عشری",
-    status: "open",
-  },
-];
-
-export function TicketsSection() {
+export function TicketsSection({ tickets }: { tickets: ITicket[] }) {
   return (
     <section className="bg-gray4 w-full p-4 rounded-4xl">
       <header className="flex justify-between items-center">
@@ -58,7 +28,15 @@ export function TicketsSection() {
       <AnimatedList
         items={tickets}
         renderItem={(ticket, index) => (
-          <TicketPreview {...ticket} key={index} />
+          <TicketPreview
+            title={ticket.title}
+            category={ticket.category}
+            code={ticket.code}
+            createdAt={ticket.createdAt}
+            fullName={ticket.user.fullName}
+            status={ticket.status}
+            key={index}
+          />
         )}
         onItemSelect={(ticket) => console.log("انتخاب شد:", ticket)}
         displayScrollbar={false}

@@ -63,7 +63,7 @@ export const getTickets = async (
 
   const [tickets, total] = await Promise.all([
     TicketModel.find(query)
-      .populate("user", "username email")
+      .populate("user", "username fullName email")
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit),
