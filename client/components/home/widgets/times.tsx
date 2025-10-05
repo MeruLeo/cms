@@ -32,7 +32,7 @@ export const TimesWidget = ({
 }: {
   periodRevenue: number;
   loading: boolean;
-  selected: "day" | "week" | "month" | "year"; // 🔥 کنترل کامل از والد
+  selected: "day" | "week" | "month" | "year";
   onChange: (value: "day" | "week" | "month" | "year") => void;
 }) => {
   return (

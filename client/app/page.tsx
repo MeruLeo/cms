@@ -19,7 +19,6 @@ export default function HomePage() {
     periodRevenue,
     periodRevenueLoading,
     fetchPeriodRevenue,
-    countOrdersByUser,
     fetchCountOrdersByUser,
     loading,
     orders,
@@ -42,7 +41,7 @@ export default function HomePage() {
 
   useEffect(() => {
     fetchPeriodRevenue(selectedPeriod);
-  }, []);
+  }, [selectedPeriod]);
 
   useEffect(() => {
     if (users.length > 0) {
