@@ -44,6 +44,11 @@ export const Sidebar: React.FC = () => {
     <aside className="bg-gray4 border-l border-gray3 p-4 h-screen w-[25%]">
       {/* Header */}
       <header>
+        <ul className="flex gap-2 mb-4 bg-gray3 w-fit p-1 rounded-full">
+          <li className="w-3 h-3 bg-red rounded-full" />
+          <li className="w-3 h-3 bg-yellow rounded-full" />
+          <li className="w-3 h-3 bg-green rounded-full" />
+        </ul>
         {user ? (
           <>
             <AvatarGroup className="flex gap-4 items-center mb-6">

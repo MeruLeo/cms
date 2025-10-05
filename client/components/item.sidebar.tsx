@@ -46,10 +46,8 @@ const SidebarBtn: React.FC<SidebarBtnProps> = ({
   isOpen,
   active,
 }) => {
-  const btnClass = `flex bg-transparent  p-2 rounded-full items-center justify-between transition-colors duration-300 ${
-    active
-      ? "bg-gradient-to-l from-gray3 border border-gray3 text-foreground to-gray4"
-      : "text-gray"
+  const btnClass = `flex p-2 rounded-xl items-center justify-between transition-colors duration-300 ${
+    active ? "bg-gray3 cursor-default" : "text-gray bg-transparent"
   }`;
 
   const inner = (

@@ -31,10 +31,20 @@ import {
   SearchIcon,
   Logo,
 } from "@/components/icons";
-import { Bell, Cog, Settings, Settings2 } from "lucide-react";
-import { usePathname } from "next/navigation";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Bell,
+  ChevronLeft,
+  ChevronRight,
+  Cog,
+  Settings,
+  Settings2,
+} from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
 
 export const Navbar = ({ title }: { title: string }) => {
+  const router = useRouter();
   const pathname = usePathname();
 
   const hiddenPaths = ["/auth"];
@@ -67,6 +77,20 @@ export const Navbar = ({ title }: { title: string }) => {
     >
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
         <NavbarBrand as="li" className="gap-3 max-w-fit">
+          <div className="bg-gray3 flex gap-1 p-1 rounded-full">
+            <Button
+              onPress={() => router.back()}
+              className="bg-gray4 flex justify-center items-center w-8 p-2 rounded-full"
+            >
+              <ChevronRight />
+            </Button>
+            <Button
+              onPress={() => router.forward()}
+              className="bg-gray4 flex justify-center items-center w-8 p-2 rounded-full"
+            >
+              <ChevronLeft />
+            </Button>
+          </div>
           <NextLink className="flex justify-start items-center gap-1" href="/">
             <p className="font-bold  text-2xl text-inherit">{title}</p>
           </NextLink>
