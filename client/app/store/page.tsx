@@ -1,9 +1,10 @@
-import { title } from "@/components/primitives";
+import { HeaderSection } from "@/components/store/modules/headerSection";
+import { widgetConfigStore } from "@/config/store/widgets.config";
 
 export default function StorePage() {
   return (
-    <div>
-      <h1 className={title()}>Store</h1>
-    </div>
+    <section className="flex w-full overflow-auto h-fit flex-col items-center justify-center gap-2 py-5 px-4">
+      <HeaderSection widgets={widgetConfigStore} />
+    </section>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { widgetConfig } from "@/config/home/widget.config";
+import { widgetConfig } from "@/config/home/widgets.config";
 import { useOrderStore } from "@/stores/order.store";
 import { useUserStore } from "@/stores/user.store";
 import { HeaderSection } from "@/components/home/modules/headerSection";
