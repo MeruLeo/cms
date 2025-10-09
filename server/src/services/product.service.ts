@@ -13,6 +13,7 @@ export interface FindProductsOptions {
     priceMax?: number;
     inStock?: boolean;
     tags?: string[];
+    search?: string;
   };
   page: number;
   limit: number;
@@ -30,6 +31,16 @@ export const findProducts = async ({
   const skip = (safePage - 1) * safeLimit;
 
   const query: FilterQuery<IProduct> = {};
+
+  if (filters.search) {
+    const searchRegex = { $regex: filters.search, $options: "i" };
+    query.$or = [
+      { title: searchRegex },
+      { category: searchRegex },
+      { slug: searchRegex },
+      { tags: searchRegex },
+    ];
+  }
 
   if (filters.title) {
     query.title = { $regex: filters.title, $options: "i" };
@@ -71,7 +82,7 @@ export const findProducts = async ({
   const [items, total] = await Promise.all([
     ProductModel.find(query)
       .select("-__v")
-      .sort(sort)
+      .sort(sort || "-createdAt")
       .skip(skip)
       .limit(safeLimit),
     ProductModel.countDocuments(query),

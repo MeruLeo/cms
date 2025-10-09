@@ -34,7 +34,7 @@ export const useProductStore = create<ProductState>((set) => ({
   setProducts: (products) => set({ products }),
   setSelectedProduct: (product) => set({ selectedProduct: product }),
 
-  fetchAllProducts: async (params) => {
+  fetchAllProducts: async (params = {}) => {
     set({ loading: true, error: null });
     try {
       const res = await productService.getAllProducts(params);

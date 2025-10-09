@@ -10,6 +10,7 @@ import { couponService } from "./coupon.service";
 import { Types } from "mongoose";
 import { ProductModel } from "../models/Product";
 import { CodeGenerator } from "../utils/codeGenerator";
+import { ProductStatus } from "../types/product.type";
 
 interface OrderItem {
   productId: string;
@@ -83,10 +84,17 @@ export const orderService = {
       code: orderCode,
     });
 
+    // ↓ به‌روزرسانی موجودی و وضعیت محصول
     for (const item of data.items) {
-      await ProductModel.findByIdAndUpdate(item.productId, {
-        $inc: { stockCount: -item.quantity },
-      });
+      const product = await ProductModel.findById(item.productId);
+      if (!product) continue;
+
+      product.stockCount = Math.max(product.stockCount - item.quantity, 0);
+      if (product.stockCount === 0) {
+        product.status = ProductStatus.OUT_OF_STOCK;
+      }
+
+      await product.save();
     }
 
     return order.toObject();

@@ -41,6 +41,9 @@ export function DynamicTable<T extends { _id?: string }>({
 }: DynamicTableProps<T>) {
   return (
     <div className="w-full">
+      <div className="text-sm text-right text-zinc-500 my-2">
+        {formatNumber(total, "price")} عنوان یافت شده
+      </div>
       <Table
         aria-label="Dynamic data table"
         className="min-w-full border border-zinc-800 rounded-2xl"
@@ -89,10 +92,6 @@ export function DynamicTable<T extends { _id?: string }>({
           />
         </div>
       )}
-
-      <div className="text-sm text-zinc-500 text-center mt-2">
-        مجموع: {formatNumber(total, "price")} مورد
-      </div>
     </div>
   );
 }
