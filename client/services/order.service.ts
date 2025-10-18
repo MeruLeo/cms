@@ -11,46 +11,67 @@ export interface CreateOrderPayload {
   couponCode?: string;
 }
 
-export interface OrderResponse {
-  ok: boolean;
-  message: string;
-  order: IOrder;
-}
-
 export interface MonthlySalesResponse {
   month: number;
   sales: number;
 }
 
+export interface FindOrdersOptions {
+  filters: {
+    code?: string;
+    userId?: string;
+    status?: OrderStatus;
+    startDate?: string;
+    endDate?: string;
+    search?: string;
+  };
+  page: number;
+  limit: number;
+  sort: string;
+}
+
+export interface FindOrdersResponse {
+  orders: IOrder[];
+  total: number;
+  page: number;
+  limit: number;
+  pages: number;
+}
+
 export const orderService = {
   createOrder: (data: CreateOrderPayload) =>
-    apiClient.post<OrderResponse>("/orders", data),
+    apiClient.post<IOrder>("/orders", data),
 
-  getMyOrders: () => apiClient.get<{ orders: IOrder[] }>("/orders/user"),
+  getOrdersByUser: (userId?: string) =>
+    apiClient.get<IOrder[]>(`/orders/user${userId ? `/${userId}` : ""}`),
 
-  getAnotherOrders: (userId: string) =>
-    apiClient.get<{ orders: IOrder[] }>(`/orders/user/${userId}`),
+  countOrdersByUser: (userId: string) =>
+    apiClient.get<number>(`/orders/user/${userId}/count`),
 
-  getOrdersCountByUser: (userId: string) =>
-    apiClient.get<{ count: number }>(`/orders/user/${userId}/count`),
+  findOrders: (options: FindOrdersOptions) =>
+    apiClient.get<FindOrdersResponse>("/orders", {
+      params: {
+        ...options.filters,
+        page: options.page,
+        limit: options.limit,
+        sort: options.sort,
+      },
+    }),
 
-  getAllOrders: () => apiClient.get<{ orders: IOrder[] }>("/orders"),
-
-  getOrderById: (orderId: string) =>
-    apiClient.get<{ order: IOrder }>(`/orders/${orderId}`),
+  findOrderById: (orderId: string) =>
+    apiClient.get<IOrder>(`/orders/${orderId}`),
 
   updateOrderStatus: (orderId: string, status: OrderStatus) =>
-    apiClient.patch<{ order: IOrder }>(`/orders/${orderId}`, { status }),
+    apiClient.patch<IOrder>(`/orders/${orderId}`, { status }),
 
   deleteOrder: (orderId: string) =>
     apiClient.delete<{ ok: boolean; message: string }>(`/orders/${orderId}`),
 
-  getTotalRevenue: () =>
-    apiClient.get<{ total: number }>("/orders/total-revenue"),
+  getTotalRevenue: () => apiClient.get<number>("/orders/total-revenue"),
 
   getRevenueByPeriod: (period: "day" | "week" | "month" | "year") =>
-    apiClient.get<{ total: number }>(`/orders/revenue?period=${period}`),
+    apiClient.get<number>(`/orders/revenue?period=${period}`),
 
-  getMonthlySalesHandler: (year?: number) =>
+  getMonthlySales: (year?: number) =>
     apiClient.get<MonthlySalesResponse[]>(`/orders/monthly-sales?year=${year}`),
 };

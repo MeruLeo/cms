@@ -1,16 +1,13 @@
 import * as jalaali from "jalaali-js";
 import { AppError } from "../middlewares/errorHandler";
 import OrderModel from "../models/Order";
-import {
-  createOrderSchema,
-  OrderStatus,
-  orderStatusEnum,
-} from "../validators/orders.schema";
+import { OrderStatus } from "../validators/orders.schema";
 import { couponService } from "./coupon.service";
-import { Types } from "mongoose";
+import { Types, FilterQuery, PipelineStage } from "mongoose";
 import { ProductModel } from "../models/Product";
 import { CodeGenerator } from "../utils/codeGenerator";
 import { ProductStatus } from "../types/product.type";
+import { IOrder } from "../types/order.type";
 
 interface OrderItem {
   productId: string;
@@ -22,6 +19,20 @@ interface CreateOrderInput {
   items: OrderItem[];
   shippingCost?: number;
   couponCode?: string;
+}
+
+export interface FindOrdersOptions {
+  filters: {
+    code?: string;
+    userId?: string;
+    status?: OrderStatus;
+    startDate?: string;
+    endDate?: string;
+    search?: string;
+  };
+  page: number;
+  limit: number;
+  sort: string;
 }
 
 export const orderService = {
@@ -84,7 +95,6 @@ export const orderService = {
       code: orderCode,
     });
 
-    // ↓ به‌روزرسانی موجودی و وضعیت محصول
     for (const item of data.items) {
       const product = await ProductModel.findById(item.productId);
       if (!product) continue;
@@ -170,8 +180,6 @@ export const orderService = {
       now.getUTCSeconds(),
       now.getUTCMilliseconds()
     );
-
-    // Convert current UTC date to Jalali
     const jalaliNow = jalaali.toJalaali(
       now.getUTCFullYear(),
       now.getUTCMonth() + 1,
@@ -187,14 +195,8 @@ export const orderService = {
         startJD = jalaliNow.jd;
         break;
       case "week": {
-        // Calculate start of the week (Saturday = 6 in JS, but adjust for Jalali)
-        const jalaliDayOfWeek = (new Date(utcNow).getUTCDay() + 1) % 7; // Adjust to Persian week: 0=Saturday, 1=Sunday, ..., 6=Friday? Wait, Persian week: Saturday=1? No.
-        // In Jalali, week starts on Saturday (Shanbe = 0 in some libs).
-        // We need to find the Saturday before or on today.
-        // First, get Gregorian day of week: 0=Sun,1=Mon,...,6=Sat
         const gregDayOfWeek = now.getUTCDay();
-        // Persian week starts on Saturday (6).
-        const daysToSaturday = (gregDayOfWeek + 1) % 7; // Days back to Saturday
+        const daysToSaturday = (gregDayOfWeek + 1) % 7;
         const startGregDate = new Date(utcNow);
         startGregDate.setUTCDate(startGregDate.getUTCDate() - daysToSaturday);
         const startJalali = jalaali.toJalaali(
@@ -303,5 +305,108 @@ export const orderService = {
       month: parseInt(month),
       sales: monthlySales[parseInt(month)],
     }));
+  },
+
+  async findOrders({ filters, limit, page, sort }: FindOrdersOptions) {
+    const safePage = page > 0 ? page : 1;
+    const safeLimit = limit > 0 && limit <= 100 ? limit : 20;
+    const skip = (safePage - 1) * safeLimit;
+
+    const query: FilterQuery<IOrder> = {};
+
+    if (filters.code) {
+      query.code = { $regex: filters.code, $options: "i" };
+    }
+
+    if (filters.status) {
+      query.status = filters.status;
+    }
+
+    if (filters.startDate || filters.endDate) {
+      const dateFilter: any = {};
+      if (filters.startDate) dateFilter.$gte = new Date(filters.startDate);
+      if (filters.endDate) dateFilter.$lte = new Date(filters.endDate);
+      query.createdAt = dateFilter;
+    }
+
+    if (filters.userId) {
+      if (!Types.ObjectId.isValid(filters.userId)) {
+        throw new AppError("Invalid userId", 400);
+      }
+      query["user._id"] = new Types.ObjectId(filters.userId);
+    }
+
+    let searchOr: any[] = [];
+    if (filters.search) {
+      const searchRegex = { $regex: filters.search, $options: "i" };
+      searchOr = [
+        { code: searchRegex },
+        { "user.username": searchRegex },
+        { "user.email": searchRegex },
+        { "user.fullName": searchRegex },
+      ];
+    }
+
+    const pipeline: PipelineStage[] = [
+      {
+        $lookup: {
+          from: "users",
+          localField: "user",
+          foreignField: "_id",
+          as: "user",
+          pipeline: [{ $project: { username: 1, fullName: 1, email: 1 } }],
+        },
+      },
+      { $unwind: "$user" },
+    ];
+
+    let finalMatch: any = query;
+    if (searchOr.length > 0) {
+      if (Object.keys(query).length > 0) {
+        finalMatch = { $and: [query, { $or: searchOr }] };
+      } else {
+        finalMatch = { $or: searchOr };
+      }
+    }
+
+    if (Object.keys(finalMatch).length > 0) {
+      pipeline.push({ $match: finalMatch });
+    }
+
+    const parseSort = (sortStr: string): Record<string, 1 | -1> => {
+      const sortObj: Record<string, 1 | -1> = {};
+      sortStr.split(",").forEach((field) => {
+        const trim = field.trim();
+        const dir = trim.startsWith("-") ? -1 : 1;
+        const key = trim.startsWith("-") ? trim.slice(1) : trim;
+        sortObj[key] = dir;
+      });
+      return sortObj;
+    };
+
+    const effectiveSort = sort || "-createdAt";
+    const sortObj = parseSort(effectiveSort);
+
+    const itemsPipeline = [
+      ...pipeline,
+      { $sort: sortObj },
+      { $skip: skip },
+      { $limit: safeLimit },
+      { $project: { __v: 0 } },
+    ];
+
+    const items = await OrderModel.aggregate(itemsPipeline).exec();
+
+    const countPipeline = [...pipeline, { $count: "total" }];
+    const countResult = await OrderModel.aggregate(countPipeline).exec();
+    const total = countResult[0]?.total || 0;
+
+    return {
+      items,
+      total,
+      page: safePage,
+      limit: safeLimit,
+      pages: Math.ceil(total / safeLimit),
+    };
   },
 };

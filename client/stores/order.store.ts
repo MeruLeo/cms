@@ -5,6 +5,7 @@ import {
   orderService,
   CreateOrderPayload,
   MonthlySalesResponse,
+  FindOrdersOptions,
 } from "@/services/order.service";
 import { IOrder, OrderStatus } from "@/types/order.type";
 
@@ -17,6 +18,8 @@ interface OrderState {
   periodRevenueLoading: boolean;
   monthlySales: MonthlySalesResponse[];
   countOrdersByUser: Record<string, number>;
+  total: number;
+  pages: number;
   loading: boolean;
   error: string | null;
 
@@ -27,7 +30,7 @@ interface OrderState {
   fetchMyOrders: () => Promise<void>;
   fetchAnotherUserOrders: (userId: string) => Promise<void>;
   fetchCountOrdersByUser: (userId: string) => Promise<void>;
-  fetchAllOrders: () => Promise<void>;
+  fetchAllOrders: (options: FindOrdersOptions) => Promise<void>;
   fetchOrderById: (id: string) => Promise<void>;
   createOrder: (data: CreateOrderPayload) => Promise<void>;
   updateOrderStatus: (id: string, status: OrderStatus) => Promise<void>;
@@ -36,7 +39,7 @@ interface OrderState {
   fetchPeriodRevenue: (
     period: "day" | "week" | "month" | "year"
   ) => Promise<void>;
-  fetchMonthlySales: (yaer?: number) => Promise<void>;
+  fetchMonthlySales: (year?: number) => Promise<void>;
 }
 
 export const useOrderStore = create<OrderState>((set) => ({
@@ -48,6 +51,8 @@ export const useOrderStore = create<OrderState>((set) => ({
   periodRevenueLoading: false,
   monthlySales: [],
   countOrdersByUser: {},
+  total: 0,
+  pages: 0,
   loading: false,
   error: null,
 
@@ -57,8 +62,8 @@ export const useOrderStore = create<OrderState>((set) => ({
   fetchMyOrders: async () => {
     set({ loading: true, error: null });
     try {
-      const res = await orderService.getMyOrders();
-      set({ orders: res.data.orders, loading: false });
+      const res = await orderService.getOrdersByUser();
+      set({ orders: res.data, loading: false });
     } catch (err: any) {
       set({
         error: err.response?.data?.message || "Failed to fetch user orders",
@@ -70,8 +75,8 @@ export const useOrderStore = create<OrderState>((set) => ({
   fetchAnotherUserOrders: async (userId) => {
     set({ loading: true, error: null });
     try {
-      const res = await orderService.getAnotherOrders(userId);
-      set({ orders: res.data.orders, loading: false });
+      const res = await orderService.getOrdersByUser(userId);
+      set({ orders: res.data, loading: false });
     } catch (err: any) {
       set({
         error: err.response?.data?.message || "Failed to fetch user orders",
@@ -83,11 +88,11 @@ export const useOrderStore = create<OrderState>((set) => ({
   fetchCountOrdersByUser: async (userId) => {
     set({ loading: true, error: null });
     try {
-      const res = await orderService.getOrdersCountByUser(userId);
+      const res = await orderService.countOrdersByUser(userId);
       set((state) => ({
         countOrdersByUser: {
           ...state.countOrdersByUser,
-          [userId]: res.data.count,
+          [userId]: res.data,
         },
         loading: false,
       }));
@@ -99,11 +104,16 @@ export const useOrderStore = create<OrderState>((set) => ({
     }
   },
 
-  fetchAllOrders: async () => {
+  fetchAllOrders: async (options: FindOrdersOptions) => {
     set({ loading: true, error: null });
     try {
-      const res = await orderService.getAllOrders();
-      set({ orders: res.data.orders, loading: false });
+      const res = await orderService.findOrders(options);
+      set({
+        orders: res.data.orders,
+        total: res.data.total,
+        pages: res.data.pages,
+        loading: false,
+      });
     } catch (err: any) {
       set({
         error: err.response?.data?.message || "Failed to fetch all orders",
@@ -115,8 +125,8 @@ export const useOrderStore = create<OrderState>((set) => ({
   fetchOrderById: async (id) => {
     set({ loading: true, error: null });
     try {
-      const res = await orderService.getOrderById(id);
-      set({ selectedOrder: res.data.order, loading: false });
+      const res = await orderService.findOrderById(id);
+      set({ selectedOrder: res.data, loading: false });
     } catch (err: any) {
       set({
         error: err.response?.data?.message || "Failed to fetch order",
@@ -130,7 +140,7 @@ export const useOrderStore = create<OrderState>((set) => ({
     try {
       const res = await orderService.createOrder(data);
       set((state) => ({
-        orders: [res.data.order, ...state.orders],
+        orders: [res.data, ...state.orders],
         loading: false,
       }));
     } catch (err: any) {
@@ -147,7 +157,7 @@ export const useOrderStore = create<OrderState>((set) => ({
     try {
       const res = await orderService.updateOrderStatus(id, status);
       set((state) => ({
-        orders: state.orders.map((o) => (o._id === id ? res.data.order : o)),
+        orders: state.orders.map((o) => (o._id === id ? res.data : o)),
         loading: false,
       }));
     } catch (err: any) {
@@ -178,7 +188,7 @@ export const useOrderStore = create<OrderState>((set) => ({
     set({ totalRevenueLoading: true, error: null });
     try {
       const res = await orderService.getTotalRevenue();
-      set({ totalRevenue: res.data.total, totalRevenueLoading: false });
+      set({ totalRevenue: res.data, totalRevenueLoading: false });
     } catch (err: any) {
       set({
         error: err.response?.data?.message || "Failed to fetch revenue",
@@ -191,7 +201,7 @@ export const useOrderStore = create<OrderState>((set) => ({
     set({ periodRevenueLoading: true, error: null });
     try {
       const res = await orderService.getRevenueByPeriod(period);
-      set({ periodRevenue: res.data.total, periodRevenueLoading: false });
+      set({ periodRevenue: res.data, periodRevenueLoading: false });
     } catch (err: any) {
       set({
         error: err.response?.data?.message || "Failed to fetch revenue",
@@ -203,7 +213,7 @@ export const useOrderStore = create<OrderState>((set) => ({
   fetchMonthlySales: async (year) => {
     set({ loading: true, error: null });
     try {
-      const res = await orderService.getMonthlySalesHandler(year);
+      const res = await orderService.getMonthlySales(year);
       set({ monthlySales: res.data, loading: false });
     } catch (err: any) {
       set({

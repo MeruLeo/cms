@@ -69,13 +69,17 @@ export default function CustomersTable() {
       label: "وضعیت کاربر",
       render: (item: IUser) =>
         item.isActive ? (
-          <Chip color="success" variant="faded">
+          <span
+            className={`px-3 py-1 rounded-lg text-xs font-medium ${item.isActive ? "bg-green-500/10 text-green-500 border border-green-500/20" : "bg-gray-500/10 text-gray-400 border border-gray-500/20"}`}
+          >
             فعال
-          </Chip>
+          </span>
         ) : (
-          <Chip color="danger" variant="faded">
+          <span
+            className={`px-3 py-1 rounded-lg text-xs font-medium ${item.isActive ? "bg-green-500/10 text-green-500 border border-green-500/20" : "bg-gray-500/10 text-gray-400 border border-gray-500/20"}`}
+          >
             غیرفعال
-          </Chip>
+          </span>
         ),
     },
     {

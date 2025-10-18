@@ -32,11 +32,11 @@ interface DynamicTableProps<T> {
 
 export function DynamicTable<T extends { _id?: string }>({
   columns,
-  data,
+  data = [], // ← default به آرایه خالی برای جلوگیری از undefined
   total,
   page,
   pages,
-  loading,
+  loading = false, // ← default false
   onPageChange,
 }: DynamicTableProps<T>) {
   return (
@@ -55,30 +55,34 @@ export function DynamicTable<T extends { _id?: string }>({
           ))}
         </TableHeader>
 
-        <TableBody
-          items={data}
-          isLoading={loading}
-          loadingContent={
-            <div className="flex justify-center items-center py-8">
-              <Spinner label="در حال بارگذاری..." />
-            </div>
-          }
-          emptyContent={
-            <div className="text-center text-zinc-400 py-6">
-              هیچ داده‌ای یافت نشد.
-            </div>
-          }
-        >
-          {(item) => (
-            <TableRow key={item._id || Math.random()}>
-              {columns.map((col) => (
-                <TableCell key={col.key as string}>
-                  {col.render ? col.render(item) : (item as any)[col.key]}
-                </TableCell>
-              ))}
+        {loading ? ( // ← شرطی کردن TableBody برای loading
+          <TableBody>
+            <TableRow>
+              <TableCell colSpan={columns.length} className="text-center py-8">
+                <Spinner label="در حال بارگذاری..." />
+              </TableCell>
             </TableRow>
-          )}
-        </TableBody>
+          </TableBody>
+        ) : (
+          <TableBody
+            items={data} // ← همیشه آرایه معتبر
+            emptyContent={
+              <div className="text-center text-zinc-400 py-6">
+                هیچ داده‌ای یافت نشد.
+              </div>
+            }
+          >
+            {(item) => (
+              <TableRow key={item._id || Math.random()}>
+                {columns.map((col) => (
+                  <TableCell key={col.key as string}>
+                    {col.render ? col.render(item) : (item as any)[col.key]}
+                  </TableCell>
+                ))}
+              </TableRow>
+            )}
+          </TableBody>
+        )}
       </Table>
 
       {pages > 1 && (
