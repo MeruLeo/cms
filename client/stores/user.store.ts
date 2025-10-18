@@ -38,7 +38,7 @@ export const useUserStore = create<UserState>((set) => ({
   setUsers: (users) => set({ users }),
   setSelectedUser: (user) => set({ selectedUser: user }),
 
-  fetchAllUsers: async (params) => {
+  fetchAllUsers: async (params = {}) => {
     set({ loading: true, error: null });
     try {
       const res = await userService.getAllUsers(params);

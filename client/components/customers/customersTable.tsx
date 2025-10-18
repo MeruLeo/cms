@@ -10,14 +10,16 @@ import { ConfirmModal } from "@/components/common/confirm";
 import { addToast } from "@heroui/toast";
 import { Input } from "@heroui/input";
 import { Tab, Tabs } from "@heroui/tabs";
+import { useUserStore } from "@/stores/user.store";
+import { IUser } from "@/types/user.type";
+import { Chip } from "@heroui/chip";
 
-export default function ProductsTable() {
-  const { products, total, pages, loading, fetchAllProducts, deleteProduct } =
-    useProductStore();
+export default function CustomersTable() {
+  const { users, pages, loading, total, fetchAllUsers, deleteUser } =
+    useUserStore();
 
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const [activeTab, setActiveTab] = useState("all");
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [confirmLoading, setConfirmLoading] = useState(false);
@@ -27,28 +29,16 @@ export default function ProductsTable() {
     let sort = "-createdAt";
     const params: any = { search: searchTerm, page, limit };
 
-    switch (activeTab) {
-      case "bestselling":
-        sort = "-salesCount";
-        break;
-      case "lowselling":
-        sort = "salesCount";
-        break;
-      case "outofstock":
-        params.status = "out_of_stock";
-        break;
-    }
-
     params.sort = sort;
     return params;
   };
 
   useEffect(() => {
     const delay = setTimeout(() => {
-      fetchAllProducts(getSortParams());
+      fetchAllUsers(getSortParams());
     }, 400);
     return () => clearTimeout(delay);
-  }, [page, searchTerm, activeTab]);
+  }, [page, searchTerm]);
 
   const handleOpenConfirm = (id: string) => {
     setSelectedId(id);
@@ -58,54 +48,50 @@ export default function ProductsTable() {
   const handleConfirmDelete = async () => {
     if (!selectedId) return;
     setConfirmLoading(true);
-    await deleteProduct(selectedId);
-    addToast({ title: "محصول با موفقیت حذف شد", color: "success" });
-    await fetchAllProducts(getSortParams());
+    await deleteUser(selectedId);
+    addToast({ title: "کاربر با موفقیت حذف شد", color: "success" });
+    await fetchAllUsers(getSortParams());
     setConfirmLoading(false);
     setConfirmOpen(false);
     setSelectedId(null);
   };
 
   const columns = [
-    { key: "title", label: "عنوان" },
-    { key: "category", label: "دسته‌بندی" },
+    { key: "fullName", label: "نام کامل" },
+    { key: "email", label: "ایمیل" },
     {
-      key: "price",
-      label: "قیمت",
-      render: (item: IProduct) => `${formatNumber(item.price, "price")} تومان`,
+      key: "role",
+      label: "نقش",
+      render: (item: IUser) => (item.role === "admin" ? "مدیر" : "مشتری"),
     },
     {
-      key: "stockCount",
-      label: "موجودی",
-      render: (item: IProduct) =>
-        item.stockCount > 0 ? (
-          <span className="text-green-500">
-            {formatNumber(item.stockCount, "price")}
-          </span>
+      key: "isActive",
+      label: "وضعیت کاربر",
+      render: (item: IUser) =>
+        item.isActive ? (
+          <Chip color="success" variant="faded">
+            فعال
+          </Chip>
         ) : (
-          <span className="text-red-500">اتمام موجودی</span>
+          <Chip color="danger" variant="faded">
+            غیرفعال
+          </Chip>
         ),
     },
     {
-      key: "status",
-      label: "وضعیت",
-      render: (item: IProduct) => {
-        const map: Record<string, string> = {
-          available: "فعال",
-          out_of_stock: "ناموجود",
-          discontinued: "توقف تولید",
-        };
-        return map[item.status] || "-";
-      },
+      key: "createdAt",
+      label: "تاریخ ثبت",
+      render: (item: IUser) =>
+        item.createdAt ? formatNumber(item.createdAt, "date") : "-",
     },
     {
       key: "actions",
       label: "عملیات",
-      render: (item: IProduct) => (
+      render: (item: IUser) => (
         <div className="flex gap-2">
           <Button
             as={"a"}
-            href={`/store/${item.slug}`}
+            href={`/customers/${item._id}`}
             isIconOnly
             color="primary"
             size="sm"
@@ -143,36 +129,16 @@ export default function ProductsTable() {
           inputWrapper: "bg-gray4 w-[350px] border border-gray3",
           input: "text-sm",
         }}
-        placeholder="جستجو در محصولات، دسته‌بندی‌ها و ..."
+        placeholder="جستجو از طریق نام کاربری، ایمیل، نام کامل و ..."
         startContent={
           <SearchIcon className="text-base text-default-400 pointer-events-none flex-shrink-0" />
         }
         type="search"
       />
 
-      <div className="gap-2 flex flex-col justify-start items-start">
-        <div className="flex gap-2">
-          <ArrowUpDown />
-          <h6>مرتب‌سازی بر اساس</h6>
-        </div>
-        <Tabs
-          radius="lg"
-          selectedKey={activeTab}
-          onSelectionChange={(key) => {
-            setActiveTab(key as string);
-            setPage(1);
-          }}
-        >
-          <Tab key="all" title="همه محصولات" />
-          <Tab key="bestselling" title="پرفروش‌ترین" />
-          <Tab key="lowselling" title="کم‌فروش‌ترین" />
-          <Tab key="outofstock" title="ناموجودها" />
-        </Tabs>
-      </div>
-
-      <DynamicTable<IProduct>
+      <DynamicTable<IUser>
         columns={columns}
-        data={products}
+        data={users}
         total={total}
         page={page}
         pages={pages}
@@ -185,8 +151,8 @@ export default function ProductsTable() {
         onClose={() => setConfirmOpen(false)}
         onConfirm={handleConfirmDelete}
         type="delete"
-        title="تایید حذف محصول"
-        description="آیا از حذف این محصول اطمینان دارید؟ این عملیات غیرقابل بازگشت است."
+        title="تایید حذف کاربر"
+        description="آیا از حذف این کاربر اطمینان دارید؟ این عملیات غیرقابل بازگشت است."
         confirmText="بله، حذف شود"
         cancelText="انصراف"
         loading={confirmLoading}

@@ -10,6 +10,7 @@ interface FindUsersOptions {
     status?: string;
     startDate?: string;
     endDate?: string;
+    search?: string;
   };
   page: number;
   limit: number;
@@ -27,6 +28,15 @@ export const findUsers = async ({
   const skip = (safePage - 1) * safeLimit;
 
   const query: FilterQuery<IUser> = {};
+
+  if (filters.search) {
+    const searchRegex = { $regex: filters.search, $options: "i" };
+    query.$or = [
+      { username: searchRegex },
+      { email: searchRegex },
+      { fullName: searchRegex },
+    ];
+  }
 
   if (filters.username) {
     query.username = { $regex: filters.username, $options: "i" };

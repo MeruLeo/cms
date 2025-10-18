@@ -1,8 +1,5 @@
 import { title } from "@/components/primitives";
 import { Ripple } from "@/components/ui/ripple";
-import { Button } from "@heroui/button";
-import { LogIn, UserPlus } from "lucide-react";
-import Head from "next/head";
 import Link from "next/link";
 
 export default function AuthPage() {
